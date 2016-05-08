@@ -1,4 +1,4 @@
-# Pip.WebUI Core Services http://git.pipdevs.com/pip-webui/pip-webui-core
+# Pip.WebUI Core Services http://github.com/pip-webui/pip-webui-core
 
 Generic utilities and non-visual services to support client application development.
 
@@ -91,9 +91,9 @@ Change to your project's root directory.
 
 ```bash
 # To install only core services with dependencies.
-npm install git+ssh://git@git.pipdevs.com:pip-core/pip-webui-lib.git
-npm install git+ssh://git@git.pipdevs.com:pip-core/pip-webui-core.git
+npm install git+ssh://git@github.com:pip-core/pip-webui-lib.git
+npm install git+ssh://git@github.com:pip-core/pip-webui-core.git
 
 # To install the entire pip-webui library
-npm install git+ssh://git@git.pipdevs.com:pip-core/pip-webui.git
+npm install git+ssh://git@github.com:pip-core/pip-webui.git
 ```
