@@ -1,0 +1,124 @@
+<h2>user Agent</h2>
+<p>{{userAgent}}</p>
+
+<h2>Date</h2>
+<table>
+    <tr>
+        <td><b>Long Date:</b></td>
+        <td>{{ longDate }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatLongDate }}</td>
+    </tr>
+    <tr>
+        <td><b>Short Date:</b> </td>
+        <td>{{ shortDate }} </td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatShortDate }}</td>
+    </tr>
+    <tr>
+        <td><b>Long Date with year:</b></td>
+        <td>{{ longDateWithYear }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatLongDateWithYear }}</td>
+    </tr>
+    <tr>
+        <td><b>Short Date with year:</b></td>
+        <td>{{ shortDateWithYear }} </td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatShortDateWithYear }}</td>
+    </tr>
+    <tr>
+        <td><b>Long Time:</b></td>
+        <td>{{ longTime }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatLongTime }}</td>
+    </tr>
+    <tr>
+        <td><b>Short Time:</b></td>
+        <td>{{ shortTime }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatShortTime }}</td>
+    </tr>
+    <tr>
+        <td><b>Long DateTime:</b></td>
+        <td>{{ longDateTime }} </td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatLongDateTime }}</td>
+    </tr>
+    <tr>
+        <td><b>Short DateTime:</b></td>
+        <td>{{ shortDateTime }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatShortDateTime }}</td>
+    </tr>
+</table>
+
+<h2>Date range</h2>
+<table>
+    <tr>
+        <td><b>Date range(same date):</b></td>
+        <td>{{ dateRange }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ currentTime | formatDateRange: currentTime }}</td>
+    </tr>
+    <tr>
+        <td><b>Date range(same year):</b></td>
+        <td>{{ dateRange3 }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ fewDaysAgo | formatDateRange: currentTime }}</td>
+    </tr>
+    <tr>
+        <td><b>Date range(different years):</b></td>
+        <td>{{ dateRange2 }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ pastTime2 | formatDateRange: currentTime }}</td>
+    </tr>
+</table>
+
+<h2>DateTime range</h2>
+<table>
+    <tr>
+        <td><b>Date range(same day):</b></td>
+        <td>{{ dateTimeRangeDay.text }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ dateTimeRangeDay.start | formatDateTimeRange: dateTimeRangeDay.end }}</td>
+    </tr>
+    <tr>
+        <td><b>Date range(same year):</b></td>
+        <td>{{ dateTimeRangeYear.text }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ dateTimeRangeYear.start | formatDateTimeRange: dateTimeRangeYear.end }}</td>
+    </tr>
+    <tr>
+        <td><b>Date range(different years):</b></td>
+        <td>{{ dateTimeRangeDiffYear.text }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ dateTimeRangeDiffYear.start | formatDateTimeRange: dateTimeRangeDiffYear.end }}</td>
+    </tr>
+</table>
+
+<h2>DateTime range without 1 day</h2>
+<table>
+    <tr>
+        <td><b>Date range(same start date):</b></td>
+        <td>{{ dateTimeRangeStart.text }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ dateTimeRangeStart.start | formatDateTimeRange: dateTimeRangeStart.end }}</td>
+    </tr>
+    <tr>
+        <td><b>Date range(same end date):</b> </td>
+        <td>{{ dateTimeRangeStart.end }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ dateTimeRangeEnd.start | formatDateTimeRange: dateTimeRangeEnd.end }}</td>
+    </tr>
+</table>
+
+<h2>Elapsed Time</h2>
+<table>
+    <tr>
+        <td><b>Elapsed Time:</b></td>
+        <td>{{ pastTime | formatElapsedTime }}</td>
+        <td><b>Filter:</b></td>
+        <td>{{ pastTime | formatElapsedInterval }}</td>
+    </tr>
+</table>
