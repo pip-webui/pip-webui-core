@@ -21,7 +21,8 @@
             //touchedErrors: touchedErrors,            
             touchedErrorsWithHint: touchedErrorsWithHint,
             resetFormErrors: resetFormErrors,
-            setFormError: setFormError
+            setFormError: setFormError,
+            resetFieldsErrors: resetFieldsErrors
 		};
 		//-------------------
 
@@ -99,6 +100,20 @@
             }
 
             form.$serverError = {};
+        };
+        
+        function resetFieldsErrors(form, field) {
+            if (!form) return;
+            if (field && form[field] && form[field].$error) {
+                 form[field].$error = {};
+            } else {
+                for (var prop in form) {
+                    if (form[prop] && form[prop].$error) {
+                        form[prop].$error = {};
+                    };
+                }
+                if ($form && form.$error) form.$error = {};
+            }
         };
         
         function setFormError(form, error, errorFieldMap) {
