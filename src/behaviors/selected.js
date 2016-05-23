@@ -81,7 +81,7 @@
                         $element.find(className).removeClass('selected md-focused');
                         item = angular.element(item)
                             .addClass('selected md-focused')
-                            .focus();
+                            .focus(); // todo сдвигает список тут, на первом проходе
                         if (!noScroll) scrollToItem(item);
                         if (raiseEvent) defineSelectedIndex(items);
                     }
