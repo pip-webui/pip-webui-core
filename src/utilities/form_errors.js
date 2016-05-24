@@ -112,7 +112,7 @@
                         form[prop].$error = {};
                     };
                 }
-                if ($form && form.$error) form.$error = {};
+                if (form && form.$error) form.$error = {};
             }
         };
         
