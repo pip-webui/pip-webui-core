@@ -19,6 +19,7 @@ Few functions were replaced with off-the-shelf libraries. Added support for soun
 Quick Links:
 
 * [Documentation](#documentation)
+* [API Reference](http://htmlpreview.github.io/?https://github.com/pip-webui/pip-webui-core/blob/master/doc/api/index.html)
 * [Contributing](#contributing)
 * [Building](#building)
 * [Installing](#installing)

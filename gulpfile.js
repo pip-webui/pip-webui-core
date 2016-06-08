@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var ngdocs = require('gulp-ngdocs');
 
 // Add standard tasks    
 require('pip-webui-tasks').all();
@@ -11,6 +12,16 @@ gulp.task('watch', ['build-watch']);
 gulp.task('jshint', ['test-jshint']);
 gulp.task('launch', ['samples-launch']);
 gulp.task('publish', ['samples-publish']);
+
+gulp.task('docgen', function() {
+    var options = {
+        title: "API Reference",
+        html5Mode: true
+    };
+    return gulp.src('./src/**/*.js')
+        .pipe(ngdocs.process(options))
+        .pipe(gulp.dest('./doc/api'));
+});
 
 // Set default task
 gulp.task('default', ['build']);
