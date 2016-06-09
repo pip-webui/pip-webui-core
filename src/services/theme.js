@@ -361,7 +361,7 @@
     }
 
     /**
-     * @ngdoc factory
+     * @ngdoc service
      * @name pipTheme
      */
     function ThemeFactory(localStorageService, $mdTheming, $rootScope, $timeout, $state, $stateParams) {
