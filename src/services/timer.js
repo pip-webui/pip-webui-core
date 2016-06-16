@@ -18,7 +18,8 @@
                 AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
                 started = false, 
                 autoPullChangesInterval, 
-                autoUpdatePageInterval;
+                autoUpdatePageInterval,
+                autoUpdateCollectionInterval;
 
             return {
                 isStarted: isStarted,
