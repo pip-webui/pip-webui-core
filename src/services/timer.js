@@ -13,8 +13,9 @@
     thisModule.service('pipTimer', 
         function ($interval, $rootScope) {
             var 
-                AUTO_PULL_CHANGES_TIMEOUT = 60000,
-                AUTO_UPDATE_PAGE_TIMEOUT = 15000,
+                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
+                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
+                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
                 started = false, 
                 autoPullChangesInterval, 
                 autoUpdatePageInterval;
@@ -42,6 +43,10 @@
                     $rootScope.$broadcast('pipAutoUpdatePage');
                 }, AUTO_UPDATE_PAGE_TIMEOUT);
 
+                autoUpdateCollectionInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoUpdateCollection');
+                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
+
                 started = true;
             };
 
@@ -50,6 +55,9 @@
                     $interval.cancel(autoPullChangesInterval);
 
                 if (autoUpdatePageInterval)
+                    $interval.cancel(autoUpdatePageInterval);
+
+                if (autoUpdateCollectionInterval)
                     $interval.cancel(autoUpdatePageInterval);
 
                 started = false;
