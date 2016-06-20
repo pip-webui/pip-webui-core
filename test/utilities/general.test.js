@@ -1,33 +1,33 @@
 //
-//  @file general utils module tests
+//  @file general utils module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
-suite('pipUtils', function () {
+describe('pipUtils', function () {
     var pipUtils,
         $window,
         $state,
         stateProvider,
         $rootScope;
     
-    setup(module('pipUtils.General', 'pipState', function ($stateProvider) {
+    beforeEach(module('pipUtils.General', 'pipState', function ($stateProvider) {
         stateProvider = $stateProvider;
     }));
     
-    setup(inject(function(_pipUtils_, _$state_, _$window_, _$rootScope_) {
+    beforeEach(inject(function(_pipUtils_, _$state_, _$window_, _$rootScope_) {
         pipUtils = _pipUtils_;
         $window = _$window_;
         $state = _$state_;
         $rootScope = _$rootScope_;
     }));
     
-    test('generate verification codes', inject(function (pipUtils) {
+    it('generate verification codes', inject(function (pipUtils) {
         var code = pipUtils.generateVerificationCode();
 
         assert.isString(code);
         assert.equal(code.length, 10);
     }));
 
-    test('goBack', function (done) {
+    it('goBack', function (done) {
         var obj = { id: 'a3sffas23jkk35lbop45buor9et0hf'},
             spyState = sinon.spy($state, 'go'),
             spyWindow = sinon.spy($window.history, 'back');
@@ -47,7 +47,7 @@ suite('pipUtils', function () {
         done();
     });
 
-    test('sprintf', function (done) {
+    it('sprintf', function (done) {
         var buf = "string"
         var str = pipUtils.sprintf("here should be string: %s", buf);
 

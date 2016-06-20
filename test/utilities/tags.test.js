@@ -1,17 +1,17 @@
 //
-//  @file tags utils module tests
+//  @file tags utils module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
-suite('pipTags', function () {
+describe('pipTags', function () {
     var pipTags;
     
-    setup(module('pipUtils.Tags'));
+    beforeEach(module('pipUtils.Tags'));
     
-    setup(inject(function(_pipTags_) {
+    beforeEach(inject(function(_pipTags_) {
        pipTags = _pipTags_; 
     }));
 
-    test('extract tags', function (done) {
+    it('extract tags', function (done) {
         var tagList = pipTags.extractTags(
             {
                 tags: ['Tag 1', 'tag_2', 'TAG3'],

@@ -1,24 +1,24 @@
 //
-//  @file errors module tests
+//  @file errors module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipError', function() {
+describe('pipError', function() {
 
-    suite('service block', function () {
+    describe('service block', function () {
         var $rootScope,
             scopeName = "ERROR",
             errorObj,
             service;
 
-        setup(module('pipErrors'));
+        beforeEach(module('pipErrors'));
 
-        setup(inject(function (pipError, _$rootScope_) {
+        beforeEach(inject(function (pipError, _$rootScope_) {
             service = pipError;
             $rootScope = _$rootScope_;
         }));
 //
-        test('create error', function (done) {
+        it('create error', function (done) {
 
             errorObj = service(scopeName);
 
@@ -29,7 +29,7 @@ suite('pipError', function() {
             done();
         });
 
-        test('set error', function (done) {
+        it('set error', function (done) {
             var backendError = {
                 message: 'error message',
                 status: '1000'

@@ -1,8 +1,8 @@
 'use strict';
 
-suite('pipSelected', function () {
+describe('pipSelected', function () {
 
-   suite('directive', function () {
+   describe('directive', function () {
        var $compile,
            $rootScope,
            $directive,
@@ -10,17 +10,17 @@ suite('pipSelected', function () {
            pipUtils,
            elem, selectableElems, control0, control1, control2;
 
-       setup(module('pipUtils'));
-       setup(module('ngMaterial'));
-       setup(module('pipSelected'));
+       beforeEach(module('pipUtils'));
+       beforeEach(module('ngMaterial'));
+       beforeEach(module('pipSelected'));
 
-       setup(inject(function(_$compile_, _$rootScope_, _pipUtils_) {
+       beforeEach(inject(function(_$compile_, _$rootScope_, _pipUtils_) {
            $compile = _$compile_;
            $rootScope = _$rootScope_;
            pipUtils = _pipUtils_;
        }));
 
-       setup(function () {
+       beforeEach(function () {
            scope = $rootScope.$new();
            scope.items = ['Item1', 'Item2', 'Item3', 'Item4', 'Item5', 'Item6'];
            scope.count = 0;
@@ -48,7 +48,7 @@ suite('pipSelected', function () {
            control2 = selectableElems.eq(2);
        });
 
-       test('click', function (done) {
+       it('click', function (done) {
 
            control0.click();
            assert.equal(selectableElems.length, 6);
@@ -62,7 +62,7 @@ suite('pipSelected', function () {
            done();
        });
 
-       test('keydown', function (done) {
+       it('keydown', function (done) {
 
            control0.click();
            assert.equal(scope.count, 1);

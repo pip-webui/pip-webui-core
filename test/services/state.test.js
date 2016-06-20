@@ -1,35 +1,35 @@
 //
-//  @file state module tests
+//  @file state module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipState', function() {
-    suite('config block', function () {
+describe('pipState', function() {
+    describe('config block', function () {
         var pipTranslateProvider;
 
-        suiteSetup(module('pipState', function (_pipTranslateProvider_) {
+        describebeforeEach(module('pipState', function (_pipTranslateProvider_) {
             pipTranslateProvider = _pipTranslateProvider_;
         }));
 
     });
 
-    suite('run block', function () {
+    describe('run block', function () {
         var $rootScope,
             $state,
             service,
             provider;
 
-        setup(module('pipState', function (pipStateProvider) {
+        beforeEach(module('pipState', function (pipStateProvider) {
             provider = pipStateProvider;
         }));
 
-        setup(inject(function (pipState, _$rootScope_, _$state_) {
+        beforeEach(inject(function (pipState, _$rootScope_, _$state_) {
             service = pipState;
             $state = _$state_;
             $rootScope = _$rootScope_;
         }));
 
-        test('"$stateChangeError" event', function (done) {
+        it('"$stateChangeError" event', function (done) {
             $rootScope.$broadcast('$stateChangeError', {name: 'error_state'});
 
             assert.isFalse($rootScope.$routing, '$rootScope.$routing should be false');
@@ -39,7 +39,7 @@ suite('pipState', function() {
             done();
         });
 
-        test('"$stateChangeSuccess" event', function (done) {
+        it('"$stateChangeSuccess" event', function (done) {
             $rootScope.$broadcast('$stateChangeSuccess', {
                 name: 'success_state',
                 url: '/success'
@@ -64,7 +64,7 @@ suite('pipState', function() {
             done();
         });
 
-        test('"$stateChangeStart" event', function (done) {
+        it('"$stateChangeStart" event', function (done) {
             var toState = {
                     name: 'success_state',
                     url: '/success',
@@ -90,23 +90,23 @@ suite('pipState', function() {
         });
     });
 
-    suite('provider block', function () {
+    describe('provider block', function () {
         var $rootScope,
             $state,
             service,
             provider;
 
-        setup(module('pipState', function (pipStateProvider) {
+        beforeEach(module('pipState', function (pipStateProvider) {
             provider = pipStateProvider;
         }));
 
-        setup(inject(function (pipState, _$rootScope_, _$state_) {
+        beforeEach(inject(function (pipState, _$rootScope_, _$state_) {
             service = pipState;
             $state = _$state_;
             $rootScope = _$rootScope_;
         }));
 
-        test('redirect return true', function (done) {
+        it('redirect return true', function (done) {
             var toState = {
                     name: 'success_state',
                     url: '/success',
@@ -132,7 +132,7 @@ suite('pipState', function() {
             done();
         });
 
-        test('redirect throw error', function (done) {
+        it('redirect throw error', function (done) {
             var toState = {
                     name: function () {
                         return null;
@@ -161,7 +161,7 @@ suite('pipState', function() {
             done();
         });
 
-        test('redirect return false', function (done) {
+        it('redirect return false', function (done) {
             var toState = {
                     name: 'success_state',
                     url: '/success',

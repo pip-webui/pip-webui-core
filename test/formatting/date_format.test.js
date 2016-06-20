@@ -1,25 +1,25 @@
 //
-//  @file date format module tests
+//  @file date format module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipDateFormat', function() {
+describe('pipDateFormat', function() {
 
-    suite('service block', function () {
+    describe('service block', function () {
         var $rootScope,
             translate,
             service;
 
-        setup(module('pipDateFormat'));
-        setup(module('pipTranslate'));
+        beforeEach(module('pipDateFormat'));
+        beforeEach(module('pipTranslate'));
 
-        setup(inject(function (pipDateFormat, _$rootScope_, pipTranslate) {
+        beforeEach(inject(function (pipDateFormat, _$rootScope_, pipTranslate) {
             service = pipDateFormat;
             translate = pipTranslate;
             $rootScope = _$rootScope_;
         }));
 //
-        test('formatLongDate', function (done) {
+        it('formatLongDate', function (done) {
             translate.use('en');
 
             var date = new Date(new Date().getFullYear(), 0, 1);
@@ -41,7 +41,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatShortDate', function (done) {
+        it('formatShortDate', function (done) {
 
             translate.use('en');
 
@@ -64,7 +64,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatLongMonth', function (done) {
+        it('formatLongMonth', function (done) {
 
             var date = new Date(2015, 0, 1);
 
@@ -77,7 +77,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatYear', function (done) {
+        it('formatYear', function (done) {
 
             var date = new Date(2015, 0, 1);
 
@@ -87,7 +87,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatShortWeek', function (done) {
+        it('formatShortWeek', function (done) {
 
             var date = new Date(2015, 1, 15);
 
@@ -100,7 +100,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatLongDayAndMonth', function (done) {
+        it('formatLongDayAndMonth', function (done) {
 
             var date = new Date(2015, 1, 15);
 
@@ -113,7 +113,7 @@ suite('pipDateFormat', function() {
             done();
         });
 
-        test('formatDateRange', function (done) {
+        it('formatDateRange', function (done) {
 
             var date = new Date(2015, 1, 15),
                 date2 = new Date(2015, 2, 2);

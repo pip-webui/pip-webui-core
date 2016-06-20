@@ -1,17 +1,17 @@
 //
-//  @file string utils module tests
+//  @file string utils module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
-suite('pipStrings', function() {
+describe('pipStrings', function() {
 	var pipStrings;
 	
-	setup(module('pipUtils.Strings'));
+	beforeEach(module('pipUtils.Strings'));
 	
-	setup(inject(function($injector) {
+	beforeEach(inject(function($injector) {
 		pipStrings = $injector.get('pipStrings');
 	}));
 	
-	test('make string', function(done) {
+	it('make string', function(done) {
 		var original = '123456789';
 		var result = pipStrings.sampleLine(original, 5);
 		assert.equal(result, '12345');

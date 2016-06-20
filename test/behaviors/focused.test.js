@@ -1,23 +1,23 @@
 'use strict';
 
-suite('pipFocused', function () {
+describe('pipFocused', function () {
 
-    suite('directive', function () {
+    describe('directive', function () {
         var $compile,
             $rootScope,
             $timeout,
             scope,
             elem, focusableElems, control0, control1, control2;
-        setup(module('ngMaterial'));
-        setup(module('pipFocused'));
+        beforeEach(module('ngMaterial'));
+        beforeEach(module('pipFocused'));
 
-        setup(inject(function(_$compile_, _$rootScope_, _$timeout_) {
+        beforeEach(inject(function(_$compile_, _$rootScope_, _$timeout_) {
             $compile = _$compile_;
             $rootScope = _$rootScope_;
             $timeout = _$timeout_;
         }));
 
-        setup(function () {
+        beforeEach(function () {
             scope = $rootScope.$new();
             scope.buttonsSet = ['Button1', 'Button2', 'Button3', 'Button4', 'Button5', 'Button6'];
 
@@ -35,7 +35,7 @@ suite('pipFocused', function () {
             control2 = focusableElems.eq(2);
         });
 
-        test.only('focus', function (done) {
+        it.only('focus', function (done) {
 
            // control0[0].focus();
            // assert.equal(focusableElems.length, 6);
@@ -50,7 +50,7 @@ suite('pipFocused', function () {
             done();
         });
 
-        test('keydown', function (done) {
+        it('keydown', function (done) {
 
             //control0.focus();
             //assert.equal(control0.hasClass('md-focused'), true);

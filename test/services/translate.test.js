@@ -1,23 +1,23 @@
 //
-//  @file translate module tests
+//  @file translate module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipTranslate', function() {
+describe('pipTranslate', function() {
 
-    suite('provider block', function () {
+    describe('provider block', function () {
         var $rootScope,
             localStorageService,
             provider,
             service;
 
-        setup(module('pipTranslate', function (pipTranslateProvider) {
+        beforeEach(module('pipTranslate', function (pipTranslateProvider) {
             provider = pipTranslateProvider;
         }));
 
-        setup(module('LocalStorageModule'));
+        beforeEach(module('LocalStorageModule'));
 
-        setup(inject(function (_$rootScope_, _localStorageService_, pipTranslate) {
+        beforeEach(inject(function (_$rootScope_, _localStorageService_, pipTranslate) {
             $rootScope = _$rootScope_;
             localStorageService = _localStorageService_;
             service = pipTranslate;
@@ -34,7 +34,7 @@ suite('pipTranslate', function() {
         enStrings[stringName] = enString;
         ruStrings[stringName] = ruString;
 
-        test('use, language', function (done) {
+        it('use, language', function (done) {
 
             provider.translations(english, enStrings);
             provider.translations(russian, ruStrings);
@@ -50,7 +50,7 @@ suite('pipTranslate', function() {
             done();
         });
 
-        test('translate', function (done) {
+        it('translate', function (done) {
             provider.translations(english, enStrings);
             provider.translations(russian, ruStrings);
 

@@ -1,35 +1,35 @@
 //
-//  @file toasts module tests
+//  @file toasts module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipToasts', function() {
+describe('pipToasts', function() {
 
     var
         SHOW_TIMEOUT = 20000,
         SHOW_TIMEOUT_NOTIFICATIONS = 20000;
 
-    suite('service block', function () {
+    describe('service block', function () {
         var $rootScope,
             $mdToast,
             ngAudio,
             service;
 
-        setup(module('pipToasts'));
+        beforeEach(module('pipToasts'));
 
-        setup(inject(function (pipToasts, _$rootScope_, _$mdToast_, _ngAudio_) {
+        beforeEach(inject(function (pipToasts, _$rootScope_, _$mdToast_, _ngAudio_) {
             ngAudio = _ngAudio_;
             service = pipToasts;
             $rootScope = _$rootScope_;
             $mdToast = _$mdToast_;
         }));
 
-        //test('pre-load sounds', function (done) {
+        //it('pre-load sounds', function (done) {
         //    console.log('loadSpy', loadSpy.callCount);
         //    assert.equal(loadSpy.callCount, 3);
         //});
 
-        test('show notification', function (done) {
+        it('show notification', function (done) {
 
             var spy = sinon.spy($mdToast, 'show'),
                 message = 'notification',
@@ -66,7 +66,7 @@ suite('pipToasts', function() {
             done();
         });
 
-        test('show message', function (done) {
+        it('show message', function (done) {
 
             var spy = sinon.spy($mdToast, 'show'),
                 message = 'message',
@@ -102,7 +102,7 @@ suite('pipToasts', function() {
             done();
         });
 
-        test('show error', function (done) {
+        it('show error', function (done) {
 
             var spy = sinon.spy($mdToast, 'show'),
                 message = 'message',
@@ -138,7 +138,7 @@ suite('pipToasts', function() {
             done();
         });
 
-        test('show clear toasts and hide all toasts', function (done) {
+        it('show clear toasts and hide all toasts', function (done) {
 
             var spyCancel = sinon.spy($mdToast, 'cancel'),
                 spyShow = sinon.spy($mdToast, 'show'),

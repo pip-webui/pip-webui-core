@@ -1,24 +1,24 @@
 //
-//  @file transactions module tests
+//  @file transactions module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipTransactions', function() {
+describe('pipTransactions', function() {
 
-    suite('service block', function () {
+    describe('service block', function () {
         var $rootScope,
             scopeName = "TRANSACTION",
             transaction,
             service;
 
-        setup(module('pipTransactions'));
+        beforeEach(module('pipTransactions'));
 
-        setup(inject(function (pipTransaction, _$rootScope_) {
+        beforeEach(inject(function (pipTransaction, _$rootScope_) {
             service = pipTransaction;
             $rootScope = _$rootScope_;
         }));
 //
-        test('create transaction', function (done) {
+        it('create transaction', function (done) {
 
             transaction = service(scopeName);
 
@@ -29,7 +29,7 @@ suite('pipTransactions', function() {
             done();
         });
 
-        test('begin transaction', function (done) {
+        it('begin transaction', function (done) {
 
             transaction = service(scopeName);
             var
@@ -44,7 +44,7 @@ suite('pipTransactions', function() {
             done();
         });
 
-        test('abort transaction', function (done) {
+        it('abort transaction', function (done) {
 
             transaction = service(scopeName);
             var
@@ -57,7 +57,7 @@ suite('pipTransactions', function() {
             done();
         });
 
-        test('end transaction', function (done) {
+        it('end transaction', function (done) {
 
             transaction = service(scopeName);
             var

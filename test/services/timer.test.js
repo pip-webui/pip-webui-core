@@ -1,9 +1,9 @@
 //
-//  @file timer module tests
+//  @file timer module its
 //  @copyright Digital Living Software Corp. 2014-2016
 
 
-suite('pipTimer', function() {
+describe('pipTimer', function() {
 
     this.timeout(1000000);
 
@@ -11,20 +11,20 @@ suite('pipTimer', function() {
         AUTO_PULL_CHANGES_TIMEOUT = 60000,
         AUTO_UPDATE_PAGE_TIMEOUT = 15000;
 
-    suite('service block', function () {
+    describe('service block', function () {
         var $rootScope,
             $interval,
             service;
 
-        setup(module('pipTimer'));
+        beforeEach(module('pipTimer'));
 
-        setup(inject(function (pipTimer, _$rootScope_, _$interval_) {
+        beforeEach(inject(function (pipTimer, _$rootScope_, _$interval_) {
             service = pipTimer;
             $rootScope = _$rootScope_;
             $interval = _$interval_;
         }));
 
-        test('start and stop timer', function (done) {
+        it('start and stop timer', function (done) {
             service.start();
 
             assert.isTrue(service.isStarted(), "after start service.isStarted() should return true");
@@ -35,7 +35,7 @@ suite('pipTimer', function() {
             done();
         });
 
-        test('broadcast intervals', function (done) {
+        it('broadcast intervals', function (done) {
             var spy = sinon.spy($rootScope, '$broadcast');
             service.start();
 
