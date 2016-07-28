@@ -1,7 +1,7 @@
 module.exports = {
     module: {
         name: 'pipCore',
-        index: 'core'
+        styles: 'core'
     },
     build: {
         js: true,
@@ -9,10 +9,11 @@ module.exports = {
         html: false,
         css: false,
         lib: true,
-        images: false
+        images: false,
+        dist: false
     },
     file: {
-        import: [
+        lib: [
             '../pip-webui-test/dist/**/*',
             '../pip-webui-lib/dist/**/*',
             '../pip-webui-css/dist/**/*',
@@ -32,5 +33,11 @@ module.exports = {
             // '../pip-webui-support/dist/**/*',
             // '../pip-webui-help/dist/**/*'
         ]
+    },
+    samples: {
+        port: 8040,
+    },
+    api: {
+        port: 8041,
     }
 };
