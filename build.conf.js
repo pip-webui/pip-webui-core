@@ -14,10 +14,10 @@ module.exports = {
     },
     file: {
         lib: [
-            '../pip-webui-test/dist/**/*',
+            //'../pip-webui-test/dist/**/*',
             '../pip-webui-lib/dist/**/*',
-            '../pip-webui-css/dist/**/*',
-            '../pip-webui-core/dist/**/*',
+            //'../pip-webui-css/dist/**/*',
+            //'../pip-webui-core/dist/**/*',
             // '../pip-webui-rest/dist/**/*',
             // '../pip-webui-controls/dist/**/*',
             // '../pip-webui-nav/dist/**/*',
@@ -35,9 +35,9 @@ module.exports = {
         ]
     },
     samples: {
-        port: 8040,
+        port: 8040
     },
     api: {
-        port: 8041,
+        port: 8041
     }
 };
