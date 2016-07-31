@@ -7,6 +7,7 @@
 - [pip-translate-html directive](#translate_html)
 - [pipError service](#error)
 - [pipTransaction service](#transaction)
+- [pipState service](#state)
 - [pipTheme service](#theme)
 - [pipTimer service](#timer)
 - [pipDebug service](#debug)
@@ -128,6 +129,17 @@ When page communicates with server, it may execute multiple concurrent requests.
 Todo: Add code snippet that shows usage of the service
 
 Todo: Add screenshot that shows how transaction state is visualized
+
+### Methods
+Todo: Describe service methods
+
+
+## <a name="state"></a> pipState service
+
+**pipState** service extends **ui-router** with few useful features
+
+### Usage
+Todo: Add code snippet that shows usage of the service
 
 ### Methods
 Todo: Describe service methods
