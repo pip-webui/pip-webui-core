@@ -356,7 +356,7 @@
 
             pipTheme.initializeTheme(currentTheme);
         } catch (ex) {
-            pipTheme.initializeTheme('navy');
+            pipTheme.initializeTheme('blue');
         }
     }
 
