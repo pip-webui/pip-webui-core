@@ -1,6 +1,6 @@
 {
     "name": "pip-webui-core",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "author": "Digital Living Software Corp. <www.digitallivingsoftware.com>",
     "description": "Non-visual core services for Pip.WebUI",
     "contributors": [
