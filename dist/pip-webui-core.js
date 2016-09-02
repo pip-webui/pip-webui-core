@@ -114,6 +114,7 @@
                 restrict: 'A',
                 link: function (scope, element, attrs) {
                     scope.value = attrs.ngDrag;
+                    var LONG_PRESS = 50; // 50ms for longpress
                     var offset, _centerAnchor = false, _mx, _my, _tx, _ty, _mrx, _mry;
                     var _hasTouch = ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
                     var _pressEvents = 'touchstart mousedown';
@@ -233,7 +234,7 @@
                             _pressTimer = setTimeout(function () {
                                 cancelPress();
                                 onlongpress(evt);
-                            }, 100);
+                            }, LONG_PRESS);
                             $document.on(_moveEvents, cancelPress);
                             $document.on(_releaseEvents, cancelPress);
                         } else {
