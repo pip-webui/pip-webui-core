@@ -1477,6 +1477,1486 @@
 })();
 
 /**
+ * @file Assertion utilities
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipAssert', ['pipDebug']);
+
+    thisModule.provider('pipAssert', ['pipDebugProvider', function (pipDebugProvider) {
+
+        return {
+            isEmpty: pipDebugProvider.enabled() ? isEmpty : noop,
+            isObjectId: pipDebugProvider.enabled() ? isObjectId : noop,
+            isDefined: pipDebugProvider.enabled() ? isDefined : noop,
+            isDef: pipDebugProvider.enabled() ? isDefined : noop,
+            contains: pipDebugProvider.enabled() ? contains : noop,
+            equal: pipDebugProvider.enabled() ? equal : noop,
+            notEqual: pipDebugProvider.enabled() ? notEqual : noop,
+            strictEqual: pipDebugProvider.enabled() ? strictEqual : noop,
+            notStrictEqual: pipDebugProvider.enabled() ? notStrictEqual : noop,
+            isArray: pipDebugProvider.enabled() ? isArray : noop,
+            isBoolean: pipDebugProvider.enabled() ? isBoolean : noop,
+            isNumber: pipDebugProvider.enabled() ? isNumber : noop,
+            isString: pipDebugProvider.enabled() ? isString : noop,
+            isObject: pipDebugProvider.enabled() ? isObject : noop,
+            isDate: pipDebugProvider.enabled() ? isDate : noop,
+            isError: pipDebugProvider.enabled() ? isError : noop,
+            isFunction: pipDebugProvider.enabled() ? isFunction : noop,
+            isNotNull: pipDebugProvider.enabled() ? isNotNull : noop,
+            
+            $get: ['pipDebug', function(pipDebug) {
+                return {
+                    isEmpty: pipDebug.enabled() ? isEmpty : noop,
+                    isObjectId: pipDebug.enabled() ? isObjectId : noop,
+                    isDefined: pipDebug.enabled() ? isDefined : noop,
+                    isDef: pipDebug.enabled() ? isDefined : noop,
+                    contains: pipDebug.enabled() ? contains : noop,
+                    equal: pipDebug.enabled() ? equal :  noop,
+                    notEqual: pipDebug.enabled() ? notEqual : noop,
+                    strictEqual: pipDebug.enabled() ? strictEqual : noop,
+                    notStrictEqual: pipDebug.enabled() ? notStrictEqual :  noop,
+                    isArray: pipDebug.enabled() ? isArray : noop,
+                    isBoolean: pipDebug.enabled() ? isBoolean : noop,
+                    isNumber: pipDebug.enabled() ? isNumber : noop,
+                    isString: pipDebug.enabled() ? isString : noop,
+                    isObject: pipDebug.enabled() ? isObject : noop,
+                    isDate: pipDebug.enabled() ? isDate : noop,
+                    isError: pipDebug.enabled() ? isError : noop,
+                    isFunction: pipDebug.enabled() ? isFunction : noop,
+                    isNotNull: pipDebug.enabled() ? isNotNull : noop
+                }
+            }]
+        };
+
+        function noop() {}
+
+        function objectToString(o) {
+            return Object.prototype.toString.call(o);
+        }
+
+        function isArray(arg, message) {
+            if (!Array.isArray(arg)) {
+                throw new Error(message || arg + ' should be array');
+            }
+        }
+
+        function isBoolean(arg, message) {
+            if (typeof arg !== 'boolean') {
+                throw new Error(message || arg + ' should be boolean');
+            }
+        }
+
+        function isNotNull(arg, message) {
+            if (arg === null) {
+                throw new Error(message || arg + ' should be not null');
+            }
+        }
+
+        function isNumber(arg, message) {
+            if (typeof arg !== 'number') {
+                throw new Error(message || arg + ' should be number');
+            }
+        }
+
+        function isString(arg, message) {
+            if (typeof arg !== 'string') {
+                throw new Error(message || arg + ' should be string');
+            }
+        }
+
+        function isObject(arg, message) {
+            if (typeof arg !== 'object') {
+                throw new Error(message || arg + ' should be an object');
+            }
+        }
+
+        function isDate(d, message) {
+            if (typeof d === 'object' && objectToString(d) !== '[object Date]') {
+                throw new Error(message || d + ' should be a date');
+            }
+        }
+
+        function isError(e, message) {
+            if (typeof e === 'object' && (objectToString(e) !== '[object Error]' || e instanceof Error)) {
+                throw new Error(message || e + ' should be an error');
+            }
+        }
+
+        function isFunction(arg, message) {
+            if (typeof arg !== 'function') {
+                throw new Error(message || arg + ' should be a function');
+            }
+        }
+
+        function isDefined(arg, message) {
+           if (typeof arg === "undefined") {
+               throw new Error(message || arg + ' should be defined');
+           }
+        }
+
+        function isEmpty(arg, message) {
+            if (arg === null || arg === undefined || arg === false) {
+                throw new Error(message || arg + ' should be not null or undefined or false');
+            }
+        }
+
+        function contains(obj, prop, message) {
+            if (typeof obj !== 'object') {
+                throw new Error(obj + ' should be an object');
+            }
+            if (obj[prop] === null || obj[prop] === undefined) {
+                throw new Error(message || prop + ' should be in object ' + obj);
+            }
+        }
+
+        // Compares args with ==
+        function equal(actual, expected, message) {
+            if (actual != expected) {
+                throw new Error(message || actual + ' should be not equal ' + expected);
+            }
+        }
+
+        // Compares args with !=
+        function notEqual(actual, expected, message) {
+            if (actual == expected) {
+                throw new Error(message || actual + ' should be equal ' + expected);
+            }
+        }
+
+        // Compares args with ===
+        function strictEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || actual + ' should not be strict equal ' + expected);
+            }
+        }
+
+        // Compares args with !==
+        function notStrictEqual(actual, expected, message) {
+            if (actual === expected) {
+                throw new Error(message || actual + ' should not strict equal ' + expected);
+            }
+        }
+
+        // Checks if value is a valid ObjectId
+        function isObjectId(value, message) {
+            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+            if (!checkForHexRegExp.test(value)) {
+                throw new Error(message || value + ' should be an object id');
+            }
+        }
+
+    }]);
+
+})();
+
+/**
+ * @file Debugging service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDebug', []);
+
+    thisModule.provider('pipDebug', ['$logProvider', function ($logProvider) {
+
+        this.enabled = true;
+
+        return {
+            enable: enable,
+            disable: disable,
+            enabled: enabled,
+            
+            $get: ['$log', function($log) {
+                return {
+                    enabled: enabled,
+                    log: $log.log,
+                    info: $log.info,
+                    warn: $log.warn,
+                    error: $log.error,
+                    debug: $log.debug
+                }
+            }]
+        };
+
+        function enabled() {
+            return this.enabled;
+        }
+
+        function enable() {
+            this.enabled = true;
+            $logProvider.debugEnabled(true);
+        }
+
+        function disable() {
+            this.enabled = false;
+            $logProvider.debugEnabled(false);
+        }
+
+    }]);
+
+})();
+
+/**
+ * @file Error context
+ * @description
+ * Error context decouples business components that throw errors
+ * and visualization components that show them to users
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+ 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors', ['pipUtils', 'pipAssert']);
+
+    /*
+     * Error is designed to assist with error handling
+     * within different application scopes & controllers without overlap.
+     *
+     * A unique identification of the scope/controller is passed to the service
+     * when it is initialized to identify the error for that scope.
+     * */
+    thisModule.factory('pipError',
+        ['$rootScope', 'pipAssert', function ($rootScope, pipAssert) {
+
+            // Initialize error scope
+            $rootScope.errors = {};
+
+            return createError;
+
+            //----------------------------
+
+            function initError(scope) {
+                $rootScope.errors[scope] = {
+                    message: undefined,
+                    code: undefined,
+                    details: undefined
+                };
+            };
+
+            function errorMessage(error) {
+                if (_.isNull(error)) {
+                    return null;
+                }
+
+                // Process regular messages
+                if (error.message) {
+                    return error.message;
+                }
+
+                // Process server application errors
+                if (error.data) {
+                    if (error.data.code) {
+                        // process server error codes here
+                        return 'ERROR_' + error.data.code;
+                    }
+
+                    if (error.data.message) {
+                        return error.data.message;
+                    }
+                }
+
+                // Process standard HTTP errors
+                if (error.statusText) {
+                    return error.statusText;
+                }
+
+                if (error.status) {
+                    return 'ERROR_' + error.status;
+                }
+                
+                return error.data ? error.data : error;
+            };
+
+            function errorCode(error) {
+                if (_.isNull(error)) {
+                    return null;
+                }
+
+                if (error.data && error.data.code) {
+                    return error.data.code;
+                }
+
+                if (error.status) {
+                    return error.status;
+                }
+                
+                return null;
+            };
+
+            function errorDetails(error) {
+                return error && error.data ? error.data : error;
+            };
+
+            function createError(scope, scopeObject) {
+                scope = scope || 'global';
+
+                var error = {
+                    reset: function () {
+                        initError(scope);
+                    },
+
+                    empty: function() {
+                        var error = $rootScope.errors[scope];
+                        return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
+                    },
+
+                    get: function () {
+                        if ($rootScope.errors[scope]) {
+                            return $rootScope.errors[scope];
+                        }
+                        return '';
+                    },
+
+                    message: function () {
+                        if ($rootScope.errors[scope]) {
+                            return $rootScope.errors[scope].message;
+                        }
+                        return null;
+                    },
+
+                    code: function () {
+                        if ($rootScope.errors[scope]) {
+                            return $rootScope.errors[scope].code;
+                        }
+                        return null;
+                    },
+
+                    details: function () {
+                        if ($rootScope.errors[scope]) {
+                            return $rootScope.errors[scope].details;
+                        }
+                        return null;
+                    },
+
+                    set: function (error) {
+                        if (error) {
+                            pipAssert.isObject(error, "Setting error: error should be an object");
+
+                            $rootScope.errors[scope] = {
+                                message: errorMessage(error),
+                                code: errorCode(error),
+                                details: errorDetails(error)
+                            };
+                            console.error($rootScope.errors[scope]);
+                        } else {
+                            initError(scope);
+                        }
+                    }
+                };
+
+                // Assign error into scope
+                if (_.isObject(scopeObject)) scopeObject.error = error;
+
+                return error;
+            };
+        }]
+    );
+    
+})();
+/**
+ * @file Application router extended from ui.router
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
+
+    thisModule.config(
+        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+            pipTranslateProvider.translations('en', {
+                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+            });
+
+            pipTranslateProvider.translations('ru', {
+                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
+            });
+        }]
+    );
+
+    thisModule.run(
+        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
+            $rootScope.$on('$stateChangeSuccess',
+                function(event, toState, toParams, fromState, fromParams) {
+                    if ($rootScope.$user && $rootScope.$user.id && toState.params && toState.params.access) {
+                        if (toParams && toParams.party_id) {
+                            var party = _.find($rootScope.$user.party_access, {party_id: toParams.party_id});
+                            if (party) {
+                                if (toState.params.access == 'manager' && !party.manager ||
+                                    toState.params.access == 'contributor' && !party.contributor) {
+                                    if (toState.params.toState) {
+                                        event.preventDefault();
+                                        $state.go(toState.params.toState, toParams);
+                                        return;
+                                    }
+                                }
+                            } else {
+                                if (toParams.party_id != $rootScope.$user.id && toState.params.toState) {
+                                    event.preventDefault();
+                                    $state.go(toState.params.toState, toParams);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+                    // Record current and previous state
+                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
+                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
+                }
+            );
+
+            // Intercept route error
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+
+                    console.error('Error while switching route to ' + toState.name);
+                    console.error(error);
+                }
+            );
+
+
+            // Intercept route error
+            $rootScope.$on('$stateNotFound',
+                function(event, unfoundState, fromState, fromParams) {
+                    event.preventDefault();
+
+                    // todo make configured error state name
+                    $state.go('errors_missing_route',  {
+                            unfoundState: unfoundState,
+                            fromState : {
+                                to: fromState ? fromState.name : '',
+                                fromParams: fromParams
+                            }
+                        }
+                    );
+                    $rootScope.$routing = false;
+                }
+            );
+
+        }]
+    );
+
+    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
+        // Configuration of redirected states
+        var redirectedStates = {};
+
+        this.redirect = setRedirect;
+        this.state = $stateProvider.state;
+
+        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
+            $state.redirect = redirect;
+            
+            return $state;
+            
+			//------------------------
+            function redirect(event, state, params, $rootScope) {
+                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
+                pipAssert.isObject(params, "$state.redirect: params should be an object");
+
+                var toState;
+
+                $rootScope.$routing = true;
+                toState = redirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params, $rootScope);
+
+                    if (_.isNull(toState)) {
+                        $rootScope.$routing = false;
+                        throw new Error('Redirected toState cannot be null');
+                    }
+                }
+
+                if (!!toState) {
+                    $timeout(function() {
+                        event.preventDefault();
+                        $state.transitionTo(toState, params, {location: 'replace'});
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+        }];
+
+        return;        
+        //------------------
+
+        // Specify automatic redirect from one state to another
+        function setRedirect(fromState, toState) {
+            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
+            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
+            
+            redirectedStates[fromState] = toState;  
+
+            return this;
+        };
+
+    }]);
+
+})();
+
+
+(function () {
+    'use strict';
+
+    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    run.$inject = ['localStorageService', 'pipTheme', '$rootScope'];
+    ThemeFactory.$inject = ['localStorageService', '$mdTheming', '$rootScope', '$timeout', '$state', '$stateParams'];
+    angular
+        .module('pipTheme', ['ngMaterial'])
+        .config(config)
+        .run(run)
+        .factory('pipTheme', ThemeFactory);
+
+    function config($mdThemingProvider, pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            THEME: 'Theme',
+            blue: 'Blue',
+            pink: 'Pink',
+            amber: 'Amber',
+            orange: 'Orange',
+            green: 'Green',
+            navy: 'Navy',
+            grey: 'Grey'
+        });
+        pipTranslateProvider.translations('ru', {
+            THEME: 'Тема',
+            blue: 'Голубая',
+            pink: 'Розовая',
+            amber: 'Янтарная',
+            orange: 'Оранжевая',
+            green: 'Зеленая',
+            navy: 'Сине-серая',
+            grey: 'Серая'
+        });
+
+
+        registerBlueTheme('default');
+        registerBlueTheme('blue');
+        registerPinkTheme('pink');
+        registerAmberTheme('amber');
+        registerOrangeTheme('orange');
+        registerGreenTheme('green');
+        registerNavyTheme('navy');
+        registerGreyTheme('grey');
+       // registerDarkTheme('dark');
+       // registerBlackTheme('black');
+
+        $mdThemingProvider.setDefaultTheme('default');
+        $mdThemingProvider.alwaysWatchTheme(true);
+
+        function registerBlueTheme(themeName) {
+            var bluePrimaryPalette = $mdThemingProvider.extendPalette('blue', {
+                'contrastDefaultColor': 'light',
+                'contrastDarkColors': undefined
+            });
+            $mdThemingProvider.definePalette('blue-primary', bluePrimaryPalette);
+
+            var blueBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(33, 150, 243, 1)'
+            });
+            $mdThemingProvider.definePalette('blue-background', blueBackgroundPalette);
+
+            var blueAccentPalette = $mdThemingProvider.extendPalette('green', {
+                '600': 'rgba(0, 200, 83, 1)'
+            });
+            $mdThemingProvider.definePalette('blue-accent', blueAccentPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('blue-primary', {
+                    'default': '500',
+                    'hue-1': '300'
+                })
+                .backgroundPalette('blue-background', {
+                    'default': '50',  // background
+                    'hue-1': 'A200',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('blue-accent', {
+                    'default': '600'
+                });
+        }
+
+        function registerPinkTheme(themeName) {
+            var PinkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(188, 86, 121, 1)',
+                'contrastDefaultColor': 'dark',
+                'contrastLightColors': ['A200', 'A700']
+            });
+            $mdThemingProvider.definePalette('pink-background', PinkBackgroundPalette);
+
+            var PinkPrimaryPalette = $mdThemingProvider.extendPalette('pink', {
+                '600': 'rgba(255, 128, 171, 1)',
+                '700': 'rgba(188, 86, 121, .54)',
+                '900': 'rgba(188, 86, 121, 1)',
+                'contrastDefaultColor': 'light'
+            });
+            $mdThemingProvider.definePalette('pink-primary', PinkPrimaryPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('pink-primary', {
+                    'default': '900',
+                    'hue-1': '700'
+                })
+                .backgroundPalette('pink-background', {
+                    'default': '50',  // background
+                    'hue-1': 'A200',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('pink-primary', {
+                    'default': '600'
+                });
+        }
+
+
+        function registerAmberTheme(themeName) {
+            var orangeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(255, 152, 0, 1)'
+            });
+            $mdThemingProvider.definePalette('orange-background', orangeBackgroundPalette);
+
+            var orangePrimaryPalette = $mdThemingProvider.extendPalette('orange', {
+                '800': 'rgba(255, 152, 0, 1)',
+                '900': 'rgba(255, 152, 0, .54);'
+            });
+            $mdThemingProvider.definePalette('orange-primary', orangePrimaryPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('orange-primary', {
+                    'default': '800',
+                    'hue-1': '900'
+                })
+                .backgroundPalette('orange-background', {
+                    'default': '50',  // background
+                    'hue-1': 'A200',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('orange', {
+                    'default': '900'
+                });
+        }
+
+        function registerOrangeTheme(themeName) {
+            var RedBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(255, 112, 67, 1)',
+                'contrastLightColors': ['600', '700', '800', '900', 'A200']
+            });
+            $mdThemingProvider.definePalette('red-background', RedBackgroundPalette);
+
+            var RedPrimaryPalette = $mdThemingProvider.extendPalette('orange', {
+                '800': 'rgba(255, 112, 67, 1)',
+                '900': 'rgba(255, 152, 67, .54)',
+                'A100': 'rgba(255, 171, 64, 1)',
+                'contrastLightColors': ['800', '900', 'A100']
+            });
+            $mdThemingProvider.definePalette('red-primary', RedPrimaryPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('red-primary', {
+                    'default': '800',
+                    'hue-1': '900'
+                })
+                .backgroundPalette('red-background', {
+                    'default': '50',  // background
+                    'hue-1': 'A200',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('red-primary', {
+                    'default': 'A100'
+                });
+        }
+
+        function registerGreenTheme(themeName) {
+            var greenBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(76, 175, 80, 1)'
+            });
+            $mdThemingProvider.definePalette('green-background', greenBackgroundPalette);
+
+            var greenPrimaryPalette = $mdThemingProvider.extendPalette('green', {
+                '300':'#9ed4a1',
+                'contrastLightColors': ['500', '300']
+            });
+            $mdThemingProvider.definePalette('green-primary', greenPrimaryPalette);
+
+
+            var greenAccentPalette = $mdThemingProvider.extendPalette('amber', {
+                'contrastLightColors': ['A700']
+            });
+            $mdThemingProvider.definePalette('green-accent', greenAccentPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('green-primary', {
+                    'default': '500',
+                    'hue-1': '300'
+                })
+                .backgroundPalette('green-background', {
+                    'default': '50',  // background
+                    'hue-1': 'A200',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('green-accent', {
+                    'default': 'A700'
+                });
+        }
+
+        function registerNavyTheme(themeName) {
+            var greyPalette = $mdThemingProvider.extendPalette('grey', {
+                '700': 'rgba(86, 97, 125, 1)',
+                '800': 'rgba(86, 97, 125, .54)',
+                'A100': 'rgba(231, 231, 231, 1)'
+            });
+            $mdThemingProvider.definePalette('grey', greyPalette);
+
+            var tealPalette = $mdThemingProvider.extendPalette('teal', {
+                'contrastLightColors': [ '500', '600', '700', '800', '900', 'A700']
+            });
+            $mdThemingProvider.definePalette('teal', tealPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('grey', {
+                    'default': '700',
+                    'hue-1': '800'
+                })
+                .backgroundPalette('grey', {
+                    'default': '50',  // background
+                    'hue-1': '700',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('teal', {
+                    'default': 'A700'
+                });
+        }
+
+        function registerGreyTheme(themeName) {
+            var thirdPartyPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(231, 231, 231, 1)',
+                'A200': 'rgba(255, 152, 0, 1)',
+                'A400': '#a9b9c0',
+                '500': '#607D8B',
+                'A700': '#90A4AE',
+                //'800': '',
+                'contrastDefaultColor': 'dark',
+                'contrastLightColors': [ '300', '400', '500', '600', '700', '800', '900', 'A700']
+            });
+            $mdThemingProvider.definePalette('third-party', thirdPartyPalette);
+
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('third-party', {
+                    'default': '500',
+                    'hue-1': 'A400'
+                })
+                .backgroundPalette('third-party', {
+                    'default': '50',  // background
+                    'hue-1': '500',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('third-party', {
+                    'default': 'A700'
+                });
+        }
+
+        function registerDarkTheme(themeName) {
+            var darkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                '600': 'rgba(48, 48, 48, 1)',
+                '700': 'rgba(255, 255, 255, 0.54)',
+                '800': 'rgba(66, 66, 66, 1)'
+            });
+            $mdThemingProvider.definePalette('dark-background', darkBackgroundPalette);
+
+            var darkAccentPalette = $mdThemingProvider.extendPalette('green', {
+                '600': 'rgba(0, 200, 83, 1)'
+            });
+            $mdThemingProvider.definePalette('dark-accent', darkAccentPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('dark-background', {
+                    'default': '900',
+                    'hue-1': '700'
+                })
+                .backgroundPalette('dark-background', {
+                    'default': '800',  // background
+                    'hue-1': '900',  // tiles dialog
+                    'hue-2': 'A700'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('dark-accent', {
+                    'default': '600'
+                });
+        }
+
+        function registerBlackTheme(themeName) {
+            var blackBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                '600': 'rgba(48, 48, 48, 1)',
+                '700': 'rgba(255, 255, 255, 0.54)',
+                '800': 'rgba(66, 66, 66, 1)',
+                '500': 'rgba(38, 50, 56, 1)'
+            });
+            $mdThemingProvider.definePalette('black-background', blackBackgroundPalette);
+
+            var blackAccentPalette = $mdThemingProvider.extendPalette('blue-grey', {
+                '700': 'rgba(255, 255, 255, 0.54)'
+            });
+            $mdThemingProvider.definePalette('black-accent', blackAccentPalette);
+
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('black-accent', {
+                    'default': '900',
+                    'hue-1': '700'
+                })
+                .backgroundPalette('black-background', {
+                    'default': '800',  // background
+                    'hue-1': '500',  // tiles dialog
+                    'hue-2': '800'   // app bar
+                })
+                .warnPalette('red', {
+                    'default': 'A200'
+                })
+                .accentPalette('black-accent', {
+                    'default': '600'
+                });
+        }
+    }
+
+
+
+    function run(localStorageService, pipTheme, $rootScope) {
+        try {
+            var currentTheme = ($rootScope.$user && $rootScope.$user.theme) ?
+                $rootScope.$user.theme : localStorageService.get('theme');
+
+            pipTheme.initializeTheme(currentTheme);
+        } catch (ex) {
+            pipTheme.initializeTheme('blue');
+        }
+    }
+
+    /**
+     * @ngdoc service
+     * @name pipTheme
+     */
+    function ThemeFactory(localStorageService, $mdTheming, $rootScope, $timeout, $state, $stateParams) {
+        return {
+            /**
+             * Set current theme
+             * @param {String} theme - theme name
+             * @param {String}
+             * @throws {Error} 'Theme is not specified' in case if theme is not defined
+             * @throws {Error} 'Theme XXX is not registered. Please, register it first with $mdThemingProvider' if theme is not registered
+             */
+            setCurrentTheme: function (theme) {
+                if (theme == null || theme === '') {
+                    throw new Error('Theme is not specified');
+                }
+
+                if (localStorageService.get('theme') == theme && $rootScope.$theme == theme) {
+                    return;
+                }
+
+                if (!(theme in $mdTheming.THEMES)) {
+                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
+                }
+                localStorageService.set('theme', theme);
+                $rootScope.$theme = theme;
+            },
+
+            /** Add attribute 'md-theme' with value current theme
+             *  Add current theme class
+             */
+            initializeTheme: function (theme) {
+                if (theme == null || theme === '') {
+                    throw new Error('Theme is not specified');
+                }
+
+                if (!(theme in $mdTheming.THEMES)) {
+                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
+                }
+
+                $rootScope.$theme = theme;
+                $('body').attr('md-theme', '{{ $theme }}').addClass('{{ $theme }}');
+            }
+        };
+    }
+})();
+
+/**
+ * @file Global application timer service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTimer', []);
+
+    thisModule.service('pipTimer', 
+        ['$interval', '$rootScope', function ($interval, $rootScope) {
+            var 
+                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
+                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
+                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
+                started = false, 
+                autoPullChangesInterval, 
+                autoUpdatePageInterval,
+                autoUpdateCollectionInterval;
+
+            return {
+                isStarted: isStarted,
+                start: start,
+                stop: stop
+            };
+
+            //------------------------
+
+            function isStarted() {
+                return started;
+            };
+
+            function start() {
+                if (started) return;
+
+                autoPullChangesInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoPullChanges');
+                }, AUTO_PULL_CHANGES_TIMEOUT);
+
+                autoUpdatePageInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoUpdatePage');
+                }, AUTO_UPDATE_PAGE_TIMEOUT);
+
+                autoUpdateCollectionInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoUpdateCollection');
+                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
+
+                started = true;
+            };
+
+            function stop() {
+                if (autoPullChangesInterval)
+                    $interval.cancel(autoPullChangesInterval);
+
+                if (autoUpdatePageInterval)
+                    $interval.cancel(autoUpdatePageInterval);
+
+                if (autoUpdateCollectionInterval)
+                    $interval.cancel(autoUpdatePageInterval);
+
+                started = false;
+            };
+        }]
+    );
+
+})();
+
+/**
+ * @file Transaction context
+ * @description
+ * Transaction context helps to wrap multiple server requests
+ * into one logical transaction. It decouples transaction
+ * management and progress visualization to the user
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTransactions', ['pipTranslate', 'pipErrors']);
+
+	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        
+        pipTranslateProvider.translations('en', {
+            'ENTERING': 'Entering...',
+            'PROCESSING': 'Processing...',
+            'LOADING': 'Loading...',
+            'SAVING': 'Saving...'
+        });
+
+        pipTranslateProvider.translations('ru', {
+            'ENTERING': 'Вход в систему...',
+            'PROCESSING': 'Обрабатывается...',
+            'LOADING': 'Загружается...',
+            'SAVING': 'Сохраняется...'
+        });
+		
+	}]);
+
+    /*
+     * Transaction is designed to assist with transaction processing
+     * within different application scopes & controllers without overlap.
+     *
+     * A unique identification of the scope/controller is passed to the service
+     * when it is initialized to identify the error for that scope.
+     * 
+     * Transaction is also integrated with Error service. So you don't need to double it
+     * */
+    thisModule.factory('pipTransaction',
+        ['$rootScope', 'pipError', function ($rootScope, pipError) {
+
+            // Initialize transaction scope
+            $rootScope.transactions = {};
+
+            return createTransaction;
+
+            //---------------------------------
+
+            function initTransaction(scope) {
+                $rootScope.transactions[scope] = {
+                    id: undefined,
+                    operation: undefined
+                };
+            }
+            
+            function createTransaction(scope, scopeObject) {
+                scope = scope || 'global';
+
+                var error = pipError(scope);
+                var transaction = {
+                    error: error,
+
+                    reset: function () {
+                        initTransaction();
+                        error.reset();
+                    },
+
+                    busy: function() {
+                        var transaction = $rootScope.transactions[scope];
+                        return transaction != null && transaction.id;
+                    },
+
+                    failed: function() {
+                        return !error.empty();
+                    },
+
+                    aborted: function(id) {
+                        var transaction = $rootScope.transactions[scope];
+                        return _.isNull(transaction) || transaction.id != id;
+                    },
+
+                    get: function () {
+                        if (_.isNull($rootScope.transactions[scope])) {
+                            initTransaction(scope);
+                        }
+                        return $rootScope.transactions[scope];
+                    },
+
+                    id: function () {
+                        var transaction = $rootScope.transactions[scope];
+                        return transaction ? transaction.id : null;
+                    },
+
+                    operation: function () {
+                        var transaction = $rootScope.transactions[scope];
+                        return transaction ? transaction.operation : null;
+                    },
+
+                    errorMessage: function () {
+                        return error.message();
+                    },
+
+                    begin: function (operation) {
+                        var transaction = $rootScope.transactions[scope];
+                        // Transaction already in progress
+                        if (transaction != null && transaction.id) {
+                            return null;
+                        }                      
+
+                        transaction = $rootScope.transactions[scope] = {
+                            id: new Date().getTime(),
+                            operation: operation || 'PROCESSING'
+                        };
+                        error.reset();
+
+                        return transaction.id;
+                    },
+
+                    abort: function() {
+                        var transaction = $rootScope.transactions[scope];
+                        if (transaction) {
+                            transaction.id = null;
+                        }
+                        error.reset();
+                    },
+
+                    end: function (err) {
+                        if (err) error.set(err);
+                        else error.reset();
+
+                        var transaction = $rootScope.transactions[scope];
+                        if (transaction != null) {
+                            transaction.id = null;
+                        }                      
+                    }
+                };
+
+                if (_.isObject(scopeObject)) {
+                    scopeObject.error = error;
+                    scopeObject.transaction = transaction;
+                }
+
+                return transaction;
+            }
+        }]
+    );
+
+})();
+
+/**
+ * @file Translatation service
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo:
+ * - Move directives to more appropriate places
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTranslate', ['LocalStorageModule', 'pipAssert']);
+
+    thisModule.provider('pipTranslate', ['pipAssertProvider', function(pipAssertProvider) {
+        var 
+            language = 'en',
+            persist = true,
+            setRoot = true,
+            translationMap = {
+                en: {
+                    'en': 'English',
+                    'ru': 'Russian',
+                    'es': 'Spanish',
+                    'pt': 'Portuguese',
+                    'de': 'German',
+                    'fr': 'French'
+                },
+                ru: {
+                    'en': 'Английский',
+                    'ru': 'Русский',
+                    'es': 'Испанский',
+                    'pt': 'Португальский',
+                    'de': 'Немецкий',
+                    'fr': 'Французский'
+                }
+            };
+
+        this.translations = setTranslations;
+        this.language = initLanguage;
+        this.use = initLanguage;
+        this.persist = initPersist;
+        this.setRoot = initSetRoot;
+
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
+            // Read language from persistent storage
+            if (persist)
+                language = localStorageService.get('language') || language;
+
+            // Set root variable
+            if (setRoot) 
+                $rootScope.$language = language;
+            
+            // Resetting root scope to force update language on the screen
+            function reset(fullReset, partialReset) {
+                fullReset = fullReset !== undefined ? !!fullReset : true;
+                partialReset = partialReset !== undefined ? !!partialReset : true;
+
+                $rootScope.$reset = fullReset;
+                $rootScope.$partialReset = partialReset;
+                $timeout(function() {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
+            }
+
+            return {
+                use: function (newLanguage, fullReset, partialReset) {
+                    pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
+                    if (newLanguage != null && newLanguage != language) {
+                        language = newLanguage;
+                        if (persist)
+                            localStorageService.set('language', language);
+                        if (setRoot)
+                            $rootScope.$language = language;
+                        reset(fullReset, partialReset);
+                    }
+                    return language;
+                },
+
+                translations: setTranslations,
+                translate: translate,
+                translateArray: translateArray,
+                translateSet: translateSet,
+                translateObjects: translateObjects,
+                translateById: translateById,
+                translateSetById: translateSetById,
+                translateStringsSet: translateStringsSet
+            }
+        }];
+
+        // Initialize language selection
+        function initLanguage(newLanguage) {
+            pipAssertProvider.isString(newLanguage || '', "pipTranslateProvider.use or pipTranslateProvider.language: argument should be a string");
+
+            if (newLanguage != null) {
+                language = newLanguage;
+            }
+            return language;
+        }
+
+        // Initialize persistence flag
+        function initPersist(newPersist) {
+            if (newPersist != null) {
+                pipAssertProvider.isBoolean(newPersist || '', "pipTranslateProvider.persist: argument should be a boolean");
+                persist = newPersist;
+            }
+            return persist;
+        }
+
+        // Initialize set root flag
+        function initSetRoot(newSetRoot) {
+            if (newSetRoot != null) {
+                pipAssertProvider.isBoolean(newSetRoot || '', "pipTranslateProvider.setRoot: argument should be a boolean");
+                setRoot = newSetRoot;
+            }
+            return setRoot;  
+        }
+
+        // Set translation strings for specific language
+        function setTranslations(language, languageMap) {
+            pipAssertProvider.isString(language, "pipTranslate.setTranslations or pipTranslateProvider.translations: first argument should be a string");
+            pipAssertProvider.isObject(languageMap, "pipTranslate.setTranslations or pipTranslateProvider.translations: second argument should be an object");
+
+            var map = translationMap[language] || {};
+            translationMap[language] = _.extend(map, languageMap);
+        }
+
+        // Translate a string by key using set language
+        function translate(key) {
+            if (_.isNull(key) || _.isUndefined(key)) return '';
+
+            var map = translationMap[language] || {};
+            return map[key] || key;
+        }
+
+        // Translate an array of strings
+        function translateArray(keys) {
+            if (_.isNull(keys) || keys.length == 0) return [];
+
+            pipAssertProvider.isArray(keys, "pipTranslate.translateArray: argument should be an array");
+
+            var values = [];
+            var map = translationMap[language] || {};
+
+            _.each(keys, function (k) {
+                var key = k || '';
+                values.push(map[key] || key);
+            });
+
+            return values;
+        }
+
+        // Translate an array of strings into array of objects (set)
+        function translateSet(keys, key, value) {
+            if (_.isNull(keys) || keys.length == 0) return [];
+
+            pipAssertProvider.isArray(keys, "pipTranslate.translateSet: first argument should be an array");
+            pipAssertProvider.isString(key || '', "pipTranslate.translateSet: second argument should be a string");
+            pipAssertProvider.isString(value || '', "pipTranslate.translateSet: third argument should be a string");
+
+            key = key || 'id';
+            value = value || 'name';
+
+            var values = [];
+            var map = translationMap[language] || {};
+
+            _.each(keys, function (k) {
+                var obj = {}, mapKey = k || '';
+
+                obj[key] = mapKey;
+                obj[value] = map[mapKey] || mapKey;
+
+                values.push(obj);
+            });
+
+            return values;
+        }
+
+        // Translate a collection of objects
+        function translateObjects(items, key, value) {
+            if (_.isNull(items) || items.length == 0) return [];
+
+            pipAssertProvider.isArray(items, "pipTranslate.translateObjects: first argument should be an array");
+            pipAssertProvider.isString(key || '', "pipTranslate.translateObjects: second argument should be a string");
+            pipAssertProvider.isString(value || '', "pipTranslate.translateObjects: third argument should be a string");
+
+            key = key || 'name';
+            value = value || 'nameLocal';
+
+            var map = translationMap[language] || {};
+
+            _.each(items, function (i) {
+                var item = i, mapKey = item[key] || '';
+
+                item[value] = map[mapKey] || mapKey;
+            });
+
+            return items;
+        }
+
+        // Translate a string by key  with prefix using set language todo
+        function translateById(prefix, key) {
+            pipAssertProvider.isString(key || '', "pipTranslate.translateById: second argument should be a string");
+            pipAssertProvider.isString(prefix || '', "pipTranslate.translateById: first argument should be a string");
+
+            prefix = prefix ? prefix + '_' : '';
+            key = (prefix + key).replace(/ /g, '_').toUpperCase();
+            if (key == null) return '';
+            var map = translationMap[language] || {};
+            return map[key] || key;
+        };
+
+        function translateSetById(keys, prefix, key, value) {
+            if (_.isNull(keys) || keys.length == 0) return [];
+
+            pipAssertProvider.isArray(keys, "pipTranslate.translateSetById: first argument should be an array");
+            pipAssertProvider.isString(prefix || '', "pipTranslate.translateSetById: second argument should be a string");
+            pipAssertProvider.isString(key || '', "pipTranslate.translateSetById: third argument should be a string");
+            pipAssertProvider.isString(value || '', "pipTranslate.translateSetById: forth argument should be a string");
+
+            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
+            key = key || 'id';
+            value = value || 'name';
+
+            var values = [];
+            var map = translationMap[language] || {};
+
+            _.each(keys, function (k) {
+                var obj = {}, mapKey = k || '';
+
+                obj[key] = mapKey;
+                obj[value] = map[prefix + '_' + mapKey] || mapKey;
+
+                values.push(obj);
+            });
+
+            return values;
+        }
+
+        // Translate an array of strings, apply uppercase and replace ' ' => '_'
+        function translateStringsSet(keys, prefix, key, value) {
+            if (_.isNull(keys) || keys.length == 0) return [];
+
+            pipAssertProvider.isArray(keys, "pipTranslate.translateStringsSet: first argument should be an array");
+            pipAssertProvider.isString(prefix || '', "pipTranslate.translateStringsSet: second argument should be a string");
+            pipAssertProvider.isString(key || '', "pipTranslate.translateStringsSet: third argument should be a string");
+            pipAssertProvider.isString(value || '', "pipTranslate.translateStringsSet: forth argument should be a string");
+
+            key = key || 'id';
+            value = value || 'name';
+            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_': '';
+
+            var values = [];
+            var map = translationMap[language] || {};
+
+            _.each(keys, function (k) {
+                var obj = {}, mapKey = k || '';
+                obj[key] = mapKey;
+                obj[value] = map[prefix + mapKey.replace(/ /g, '_').toUpperCase()]
+                    || (prefix + mapKey.replace(/ /g, '_').toUpperCase());
+
+                values.push(obj);
+            });
+
+            return values;
+        }
+    }]);
+
+    thisModule.directive('pipTranslate', ['pipTranslate', function(pipTranslate) {
+        return {
+            restrict: 'EA',
+            scope: {
+                key1: '@pipTranslate',
+                key2: '@key'
+            },
+            link: function (scope, element, attrs) {
+                var key = scope.key1 || scope.key2;
+                var value = pipTranslate.translate(key);
+                element.text(value);
+            }
+
+        };
+    }]);
+
+    thisModule.directive('pipTranslateHtml', ['pipTranslate', function(pipTranslate) {
+        return {
+            restrict: 'EA',
+            scope: {
+                key1: '@pipTranslateHtml',
+                key2: '@key'
+            },
+            link: function (scope, element, attrs) {
+                var key = scope.key1 || scope.key2;
+                var value = pipTranslate.translate(key);
+                element.html(value);
+            }
+
+        };
+    }]);
+
+})();
+/**
  * @file Date formatting service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -3012,1484 +4492,4 @@
 		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Dates', 'pipUtils.Tags', 'pipUtils.Collections', 'pipUtils.FormErrors']);
 })();
 
-/**
- * @file Assertion utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipAssert', ['pipDebug']);
-
-    thisModule.provider('pipAssert', ['pipDebugProvider', function (pipDebugProvider) {
-
-        return {
-            isEmpty: pipDebugProvider.enabled() ? isEmpty : noop,
-            isObjectId: pipDebugProvider.enabled() ? isObjectId : noop,
-            isDefined: pipDebugProvider.enabled() ? isDefined : noop,
-            isDef: pipDebugProvider.enabled() ? isDefined : noop,
-            contains: pipDebugProvider.enabled() ? contains : noop,
-            equal: pipDebugProvider.enabled() ? equal : noop,
-            notEqual: pipDebugProvider.enabled() ? notEqual : noop,
-            strictEqual: pipDebugProvider.enabled() ? strictEqual : noop,
-            notStrictEqual: pipDebugProvider.enabled() ? notStrictEqual : noop,
-            isArray: pipDebugProvider.enabled() ? isArray : noop,
-            isBoolean: pipDebugProvider.enabled() ? isBoolean : noop,
-            isNumber: pipDebugProvider.enabled() ? isNumber : noop,
-            isString: pipDebugProvider.enabled() ? isString : noop,
-            isObject: pipDebugProvider.enabled() ? isObject : noop,
-            isDate: pipDebugProvider.enabled() ? isDate : noop,
-            isError: pipDebugProvider.enabled() ? isError : noop,
-            isFunction: pipDebugProvider.enabled() ? isFunction : noop,
-            isNotNull: pipDebugProvider.enabled() ? isNotNull : noop,
-            
-            $get: ['pipDebug', function(pipDebug) {
-                return {
-                    isEmpty: pipDebug.enabled() ? isEmpty : noop,
-                    isObjectId: pipDebug.enabled() ? isObjectId : noop,
-                    isDefined: pipDebug.enabled() ? isDefined : noop,
-                    isDef: pipDebug.enabled() ? isDefined : noop,
-                    contains: pipDebug.enabled() ? contains : noop,
-                    equal: pipDebug.enabled() ? equal :  noop,
-                    notEqual: pipDebug.enabled() ? notEqual : noop,
-                    strictEqual: pipDebug.enabled() ? strictEqual : noop,
-                    notStrictEqual: pipDebug.enabled() ? notStrictEqual :  noop,
-                    isArray: pipDebug.enabled() ? isArray : noop,
-                    isBoolean: pipDebug.enabled() ? isBoolean : noop,
-                    isNumber: pipDebug.enabled() ? isNumber : noop,
-                    isString: pipDebug.enabled() ? isString : noop,
-                    isObject: pipDebug.enabled() ? isObject : noop,
-                    isDate: pipDebug.enabled() ? isDate : noop,
-                    isError: pipDebug.enabled() ? isError : noop,
-                    isFunction: pipDebug.enabled() ? isFunction : noop,
-                    isNotNull: pipDebug.enabled() ? isNotNull : noop
-                }
-            }]
-        };
-
-        function noop() {}
-
-        function objectToString(o) {
-            return Object.prototype.toString.call(o);
-        }
-
-        function isArray(arg, message) {
-            if (!Array.isArray(arg)) {
-                throw new Error(message || arg + ' should be array');
-            }
-        }
-
-        function isBoolean(arg, message) {
-            if (typeof arg !== 'boolean') {
-                throw new Error(message || arg + ' should be boolean');
-            }
-        }
-
-        function isNotNull(arg, message) {
-            if (arg === null) {
-                throw new Error(message || arg + ' should be not null');
-            }
-        }
-
-        function isNumber(arg, message) {
-            if (typeof arg !== 'number') {
-                throw new Error(message || arg + ' should be number');
-            }
-        }
-
-        function isString(arg, message) {
-            if (typeof arg !== 'string') {
-                throw new Error(message || arg + ' should be string');
-            }
-        }
-
-        function isObject(arg, message) {
-            if (typeof arg !== 'object') {
-                throw new Error(message || arg + ' should be an object');
-            }
-        }
-
-        function isDate(d, message) {
-            if (typeof d === 'object' && objectToString(d) !== '[object Date]') {
-                throw new Error(message || d + ' should be a date');
-            }
-        }
-
-        function isError(e, message) {
-            if (typeof e === 'object' && (objectToString(e) !== '[object Error]' || e instanceof Error)) {
-                throw new Error(message || e + ' should be an error');
-            }
-        }
-
-        function isFunction(arg, message) {
-            if (typeof arg !== 'function') {
-                throw new Error(message || arg + ' should be a function');
-            }
-        }
-
-        function isDefined(arg, message) {
-           if (typeof arg === "undefined") {
-               throw new Error(message || arg + ' should be defined');
-           }
-        }
-
-        function isEmpty(arg, message) {
-            if (arg === null || arg === undefined || arg === false) {
-                throw new Error(message || arg + ' should be not null or undefined or false');
-            }
-        }
-
-        function contains(obj, prop, message) {
-            if (typeof obj !== 'object') {
-                throw new Error(obj + ' should be an object');
-            }
-            if (obj[prop] === null || obj[prop] === undefined) {
-                throw new Error(message || prop + ' should be in object ' + obj);
-            }
-        }
-
-        // Compares args with ==
-        function equal(actual, expected, message) {
-            if (actual != expected) {
-                throw new Error(message || actual + ' should be not equal ' + expected);
-            }
-        }
-
-        // Compares args with !=
-        function notEqual(actual, expected, message) {
-            if (actual == expected) {
-                throw new Error(message || actual + ' should be equal ' + expected);
-            }
-        }
-
-        // Compares args with ===
-        function strictEqual(actual, expected, message) {
-            if (actual !== expected) {
-                throw new Error(message || actual + ' should not be strict equal ' + expected);
-            }
-        }
-
-        // Compares args with !==
-        function notStrictEqual(actual, expected, message) {
-            if (actual === expected) {
-                throw new Error(message || actual + ' should not strict equal ' + expected);
-            }
-        }
-
-        // Checks if value is a valid ObjectId
-        function isObjectId(value, message) {
-            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            if (!checkForHexRegExp.test(value)) {
-                throw new Error(message || value + ' should be an object id');
-            }
-        }
-
-    }]);
-
-})();
-
-/**
- * @file Debugging service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDebug', []);
-
-    thisModule.provider('pipDebug', ['$logProvider', function ($logProvider) {
-
-        this.enabled = true;
-
-        return {
-            enable: enable,
-            disable: disable,
-            enabled: enabled,
-            
-            $get: ['$log', function($log) {
-                return {
-                    enabled: enabled,
-                    log: $log.log,
-                    info: $log.info,
-                    warn: $log.warn,
-                    error: $log.error,
-                    debug: $log.debug
-                }
-            }]
-        };
-
-        function enabled() {
-            return this.enabled;
-        }
-
-        function enable() {
-            this.enabled = true;
-            $logProvider.debugEnabled(true);
-        }
-
-        function disable() {
-            this.enabled = false;
-            $logProvider.debugEnabled(false);
-        }
-
-    }]);
-
-})();
-
-/**
- * @file Error context
- * @description
- * Error context decouples business components that throw errors
- * and visualization components that show them to users
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrors', ['pipUtils', 'pipAssert']);
-
-    /*
-     * Error is designed to assist with error handling
-     * within different application scopes & controllers without overlap.
-     *
-     * A unique identification of the scope/controller is passed to the service
-     * when it is initialized to identify the error for that scope.
-     * */
-    thisModule.factory('pipError',
-        ['$rootScope', 'pipAssert', function ($rootScope, pipAssert) {
-
-            // Initialize error scope
-            $rootScope.errors = {};
-
-            return createError;
-
-            //----------------------------
-
-            function initError(scope) {
-                $rootScope.errors[scope] = {
-                    message: undefined,
-                    code: undefined,
-                    details: undefined
-                };
-            };
-
-            function errorMessage(error) {
-                if (_.isNull(error)) {
-                    return null;
-                }
-
-                // Process regular messages
-                if (error.message) {
-                    return error.message;
-                }
-
-                // Process server application errors
-                if (error.data) {
-                    if (error.data.code) {
-                        // process server error codes here
-                        return 'ERROR_' + error.data.code;
-                    }
-
-                    if (error.data.message) {
-                        return error.data.message;
-                    }
-                }
-
-                // Process standard HTTP errors
-                if (error.statusText) {
-                    return error.statusText;
-                }
-
-                if (error.status) {
-                    return 'ERROR_' + error.status;
-                }
-                
-                return error.data ? error.data : error;
-            };
-
-            function errorCode(error) {
-                if (_.isNull(error)) {
-                    return null;
-                }
-
-                if (error.data && error.data.code) {
-                    return error.data.code;
-                }
-
-                if (error.status) {
-                    return error.status;
-                }
-                
-                return null;
-            };
-
-            function errorDetails(error) {
-                return error && error.data ? error.data : error;
-            };
-
-            function createError(scope, scopeObject) {
-                scope = scope || 'global';
-
-                var error = {
-                    reset: function () {
-                        initError(scope);
-                    },
-
-                    empty: function() {
-                        var error = $rootScope.errors[scope];
-                        return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
-                    },
-
-                    get: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope];
-                        }
-                        return '';
-                    },
-
-                    message: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].message;
-                        }
-                        return null;
-                    },
-
-                    code: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].code;
-                        }
-                        return null;
-                    },
-
-                    details: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].details;
-                        }
-                        return null;
-                    },
-
-                    set: function (error) {
-                        if (error) {
-                            pipAssert.isObject(error, "Setting error: error should be an object");
-
-                            $rootScope.errors[scope] = {
-                                message: errorMessage(error),
-                                code: errorCode(error),
-                                details: errorDetails(error)
-                            };
-                            console.error($rootScope.errors[scope]);
-                        } else {
-                            initError(scope);
-                        }
-                    }
-                };
-
-                // Assign error into scope
-                if (_.isObject(scopeObject)) scopeObject.error = error;
-
-                return error;
-            };
-        }]
-    );
-    
-})();
-/**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
-
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
-            });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    if ($rootScope.$user && $rootScope.$user.id && toState.params && toState.params.access) {
-                        if (toParams && toParams.party_id) {
-                            var party = _.find($rootScope.$user.party_access, {party_id: toParams.party_id});
-                            if (party) {
-                                if (toState.params.access == 'manager' && !party.manager ||
-                                    toState.params.access == 'contributor' && !party.contributor) {
-                                    if (toState.params.toState) {
-                                        event.preventDefault();
-                                        $state.go(toState.params.toState, toParams);
-                                        return;
-                                    }
-                                }
-                            } else {
-                                if (toParams.party_id != $rootScope.$user.id && toState.params.toState) {
-                                    event.preventDefault();
-                                    $state.go(toState.params.toState, toParams);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            
-            return $state;
-            
-			//------------------------
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-        }];
-
-        return;        
-        //------------------
-
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
-
-            return this;
-        };
-
-    }]);
-
-})();
-
-
-(function () {
-    'use strict';
-
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
-    run.$inject = ['localStorageService', 'pipTheme', '$rootScope'];
-    ThemeFactory.$inject = ['localStorageService', '$mdTheming', '$rootScope', '$timeout', '$state', '$stateParams'];
-    angular
-        .module('pipTheme', ['ngMaterial'])
-        .config(config)
-        .run(run)
-        .factory('pipTheme', ThemeFactory);
-
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            blue: 'Blue',
-            pink: 'Pink',
-            amber: 'Amber',
-            orange: 'Orange',
-            green: 'Green',
-            navy: 'Navy',
-            grey: 'Grey'
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            blue: 'Голубая',
-            pink: 'Розовая',
-            amber: 'Янтарная',
-            orange: 'Оранжевая',
-            green: 'Зеленая',
-            navy: 'Сине-серая',
-            grey: 'Серая'
-        });
-
-
-        registerBlueTheme('default');
-        registerBlueTheme('blue');
-        registerPinkTheme('pink');
-        registerAmberTheme('amber');
-        registerOrangeTheme('orange');
-        registerGreenTheme('green');
-        registerNavyTheme('navy');
-        registerGreyTheme('grey');
-       // registerDarkTheme('dark');
-       // registerBlackTheme('black');
-
-        $mdThemingProvider.setDefaultTheme('default');
-        $mdThemingProvider.alwaysWatchTheme(true);
-
-        function registerBlueTheme(themeName) {
-            var bluePrimaryPalette = $mdThemingProvider.extendPalette('blue', {
-                'contrastDefaultColor': 'light',
-                'contrastDarkColors': undefined
-            });
-            $mdThemingProvider.definePalette('blue-primary', bluePrimaryPalette);
-
-            var blueBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(33, 150, 243, 1)'
-            });
-            $mdThemingProvider.definePalette('blue-background', blueBackgroundPalette);
-
-            var blueAccentPalette = $mdThemingProvider.extendPalette('green', {
-                '600': 'rgba(0, 200, 83, 1)'
-            });
-            $mdThemingProvider.definePalette('blue-accent', blueAccentPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('blue-primary', {
-                    'default': '500',
-                    'hue-1': '300'
-                })
-                .backgroundPalette('blue-background', {
-                    'default': '50',  // background
-                    'hue-1': 'A200',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('blue-accent', {
-                    'default': '600'
-                });
-        }
-
-        function registerPinkTheme(themeName) {
-            var PinkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(188, 86, 121, 1)',
-                'contrastDefaultColor': 'dark',
-                'contrastLightColors': ['A200', 'A700']
-            });
-            $mdThemingProvider.definePalette('pink-background', PinkBackgroundPalette);
-
-            var PinkPrimaryPalette = $mdThemingProvider.extendPalette('pink', {
-                '600': 'rgba(255, 128, 171, 1)',
-                '700': 'rgba(188, 86, 121, .54)',
-                '900': 'rgba(188, 86, 121, 1)',
-                'contrastDefaultColor': 'light'
-            });
-            $mdThemingProvider.definePalette('pink-primary', PinkPrimaryPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('pink-primary', {
-                    'default': '900',
-                    'hue-1': '700'
-                })
-                .backgroundPalette('pink-background', {
-                    'default': '50',  // background
-                    'hue-1': 'A200',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('pink-primary', {
-                    'default': '600'
-                });
-        }
-
-
-        function registerAmberTheme(themeName) {
-            var orangeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(255, 152, 0, 1)'
-            });
-            $mdThemingProvider.definePalette('orange-background', orangeBackgroundPalette);
-
-            var orangePrimaryPalette = $mdThemingProvider.extendPalette('orange', {
-                '800': 'rgba(255, 152, 0, 1)',
-                '900': 'rgba(255, 152, 0, .54);'
-            });
-            $mdThemingProvider.definePalette('orange-primary', orangePrimaryPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('orange-primary', {
-                    'default': '800',
-                    'hue-1': '900'
-                })
-                .backgroundPalette('orange-background', {
-                    'default': '50',  // background
-                    'hue-1': 'A200',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('orange', {
-                    'default': '900'
-                });
-        }
-
-        function registerOrangeTheme(themeName) {
-            var RedBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(255, 112, 67, 1)',
-                'contrastLightColors': ['600', '700', '800', '900', 'A200']
-            });
-            $mdThemingProvider.definePalette('red-background', RedBackgroundPalette);
-
-            var RedPrimaryPalette = $mdThemingProvider.extendPalette('orange', {
-                '800': 'rgba(255, 112, 67, 1)',
-                '900': 'rgba(255, 152, 67, .54)',
-                'A100': 'rgba(255, 171, 64, 1)',
-                'contrastLightColors': ['800', '900', 'A100']
-            });
-            $mdThemingProvider.definePalette('red-primary', RedPrimaryPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('red-primary', {
-                    'default': '800',
-                    'hue-1': '900'
-                })
-                .backgroundPalette('red-background', {
-                    'default': '50',  // background
-                    'hue-1': 'A200',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('red-primary', {
-                    'default': 'A100'
-                });
-        }
-
-        function registerGreenTheme(themeName) {
-            var greenBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(76, 175, 80, 1)'
-            });
-            $mdThemingProvider.definePalette('green-background', greenBackgroundPalette);
-
-            var greenPrimaryPalette = $mdThemingProvider.extendPalette('green', {
-                '300':'#9ed4a1',
-                'contrastLightColors': ['500', '300']
-            });
-            $mdThemingProvider.definePalette('green-primary', greenPrimaryPalette);
-
-
-            var greenAccentPalette = $mdThemingProvider.extendPalette('amber', {
-                'contrastLightColors': ['A700']
-            });
-            $mdThemingProvider.definePalette('green-accent', greenAccentPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('green-primary', {
-                    'default': '500',
-                    'hue-1': '300'
-                })
-                .backgroundPalette('green-background', {
-                    'default': '50',  // background
-                    'hue-1': 'A200',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('green-accent', {
-                    'default': 'A700'
-                });
-        }
-
-        function registerNavyTheme(themeName) {
-            var greyPalette = $mdThemingProvider.extendPalette('grey', {
-                '700': 'rgba(86, 97, 125, 1)',
-                '800': 'rgba(86, 97, 125, .54)',
-                'A100': 'rgba(231, 231, 231, 1)'
-            });
-            $mdThemingProvider.definePalette('grey', greyPalette);
-
-            var tealPalette = $mdThemingProvider.extendPalette('teal', {
-                'contrastLightColors': [ '500', '600', '700', '800', '900', 'A700']
-            });
-            $mdThemingProvider.definePalette('teal', tealPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('grey', {
-                    'default': '700',
-                    'hue-1': '800'
-                })
-                .backgroundPalette('grey', {
-                    'default': '50',  // background
-                    'hue-1': '700',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('teal', {
-                    'default': 'A700'
-                });
-        }
-
-        function registerGreyTheme(themeName) {
-            var thirdPartyPalette = $mdThemingProvider.extendPalette('grey', {
-                'A100': 'rgba(231, 231, 231, 1)',
-                'A200': 'rgba(255, 152, 0, 1)',
-                'A400': '#a9b9c0',
-                '500': '#607D8B',
-                'A700': '#90A4AE',
-                //'800': '',
-                'contrastDefaultColor': 'dark',
-                'contrastLightColors': [ '300', '400', '500', '600', '700', '800', '900', 'A700']
-            });
-            $mdThemingProvider.definePalette('third-party', thirdPartyPalette);
-
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('third-party', {
-                    'default': '500',
-                    'hue-1': 'A400'
-                })
-                .backgroundPalette('third-party', {
-                    'default': '50',  // background
-                    'hue-1': '500',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('third-party', {
-                    'default': 'A700'
-                });
-        }
-
-        function registerDarkTheme(themeName) {
-            var darkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                '600': 'rgba(48, 48, 48, 1)',
-                '700': 'rgba(255, 255, 255, 0.54)',
-                '800': 'rgba(66, 66, 66, 1)'
-            });
-            $mdThemingProvider.definePalette('dark-background', darkBackgroundPalette);
-
-            var darkAccentPalette = $mdThemingProvider.extendPalette('green', {
-                '600': 'rgba(0, 200, 83, 1)'
-            });
-            $mdThemingProvider.definePalette('dark-accent', darkAccentPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('dark-background', {
-                    'default': '900',
-                    'hue-1': '700'
-                })
-                .backgroundPalette('dark-background', {
-                    'default': '800',  // background
-                    'hue-1': '900',  // tiles dialog
-                    'hue-2': 'A700'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('dark-accent', {
-                    'default': '600'
-                });
-        }
-
-        function registerBlackTheme(themeName) {
-            var blackBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-                '600': 'rgba(48, 48, 48, 1)',
-                '700': 'rgba(255, 255, 255, 0.54)',
-                '800': 'rgba(66, 66, 66, 1)',
-                '500': 'rgba(38, 50, 56, 1)'
-            });
-            $mdThemingProvider.definePalette('black-background', blackBackgroundPalette);
-
-            var blackAccentPalette = $mdThemingProvider.extendPalette('blue-grey', {
-                '700': 'rgba(255, 255, 255, 0.54)'
-            });
-            $mdThemingProvider.definePalette('black-accent', blackAccentPalette);
-
-            $mdThemingProvider.theme(themeName)
-                .primaryPalette('black-accent', {
-                    'default': '900',
-                    'hue-1': '700'
-                })
-                .backgroundPalette('black-background', {
-                    'default': '800',  // background
-                    'hue-1': '500',  // tiles dialog
-                    'hue-2': '800'   // app bar
-                })
-                .warnPalette('red', {
-                    'default': 'A200'
-                })
-                .accentPalette('black-accent', {
-                    'default': '600'
-                });
-        }
-    }
-
-
-
-    function run(localStorageService, pipTheme, $rootScope) {
-        try {
-            var currentTheme = ($rootScope.$user && $rootScope.$user.theme) ?
-                $rootScope.$user.theme : localStorageService.get('theme');
-
-            pipTheme.initializeTheme(currentTheme);
-        } catch (ex) {
-            pipTheme.initializeTheme('blue');
-        }
-    }
-
-    /**
-     * @ngdoc service
-     * @name pipTheme
-     */
-    function ThemeFactory(localStorageService, $mdTheming, $rootScope, $timeout, $state, $stateParams) {
-        return {
-            /**
-             * Set current theme
-             * @param {String} theme - theme name
-             * @param {String}
-             * @throws {Error} 'Theme is not specified' in case if theme is not defined
-             * @throws {Error} 'Theme XXX is not registered. Please, register it first with $mdThemingProvider' if theme is not registered
-             */
-            setCurrentTheme: function (theme) {
-                if (theme == null || theme === '') {
-                    throw new Error('Theme is not specified');
-                }
-
-                if (localStorageService.get('theme') == theme && $rootScope.$theme == theme) {
-                    return;
-                }
-
-                if (!(theme in $mdTheming.THEMES)) {
-                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
-                }
-                localStorageService.set('theme', theme);
-                $rootScope.$theme = theme;
-            },
-
-            /** Add attribute 'md-theme' with value current theme
-             *  Add current theme class
-             */
-            initializeTheme: function (theme) {
-                if (theme == null || theme === '') {
-                    throw new Error('Theme is not specified');
-                }
-
-                if (!(theme in $mdTheming.THEMES)) {
-                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
-                }
-
-                $rootScope.$theme = theme;
-                $('body').attr('md-theme', '{{ $theme }}').addClass('{{ $theme }}');
-            }
-        };
-    }
-})();
-
-/**
- * @file Global application timer service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTimer', []);
-
-    thisModule.service('pipTimer', 
-        ['$interval', '$rootScope', function ($interval, $rootScope) {
-            var 
-                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
-                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
-                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
-                started = false, 
-                autoPullChangesInterval, 
-                autoUpdatePageInterval,
-                autoUpdateCollectionInterval;
-
-            return {
-                isStarted: isStarted,
-                start: start,
-                stop: stop
-            };
-
-            //------------------------
-
-            function isStarted() {
-                return started;
-            };
-
-            function start() {
-                if (started) return;
-
-                autoPullChangesInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoPullChanges');
-                }, AUTO_PULL_CHANGES_TIMEOUT);
-
-                autoUpdatePageInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdatePage');
-                }, AUTO_UPDATE_PAGE_TIMEOUT);
-
-                autoUpdateCollectionInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdateCollection');
-                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
-
-                started = true;
-            };
-
-            function stop() {
-                if (autoPullChangesInterval)
-                    $interval.cancel(autoPullChangesInterval);
-
-                if (autoUpdatePageInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                if (autoUpdateCollectionInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                started = false;
-            };
-        }]
-    );
-
-})();
-
-/**
- * @file Transaction context
- * @description
- * Transaction context helps to wrap multiple server requests
- * into one logical transaction. It decouples transaction
- * management and progress visualization to the user
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTransactions', ['pipTranslate', 'pipErrors']);
-
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        
-        pipTranslateProvider.translations('en', {
-            'ENTERING': 'Entering...',
-            'PROCESSING': 'Processing...',
-            'LOADING': 'Loading...',
-            'SAVING': 'Saving...'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            'ENTERING': 'Вход в систему...',
-            'PROCESSING': 'Обрабатывается...',
-            'LOADING': 'Загружается...',
-            'SAVING': 'Сохраняется...'
-        });
-		
-	}]);
-
-    /*
-     * Transaction is designed to assist with transaction processing
-     * within different application scopes & controllers without overlap.
-     *
-     * A unique identification of the scope/controller is passed to the service
-     * when it is initialized to identify the error for that scope.
-     * 
-     * Transaction is also integrated with Error service. So you don't need to double it
-     * */
-    thisModule.factory('pipTransaction',
-        ['$rootScope', 'pipError', function ($rootScope, pipError) {
-
-            // Initialize transaction scope
-            $rootScope.transactions = {};
-
-            return createTransaction;
-
-            //---------------------------------
-
-            function initTransaction(scope) {
-                $rootScope.transactions[scope] = {
-                    id: undefined,
-                    operation: undefined
-                };
-            }
-            
-            function createTransaction(scope, scopeObject) {
-                scope = scope || 'global';
-
-                var error = pipError(scope);
-                var transaction = {
-                    error: error,
-
-                    reset: function () {
-                        initTransaction();
-                        error.reset();
-                    },
-
-                    busy: function() {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction != null && transaction.id;
-                    },
-
-                    failed: function() {
-                        return !error.empty();
-                    },
-
-                    aborted: function(id) {
-                        var transaction = $rootScope.transactions[scope];
-                        return _.isNull(transaction) || transaction.id != id;
-                    },
-
-                    get: function () {
-                        if (_.isNull($rootScope.transactions[scope])) {
-                            initTransaction(scope);
-                        }
-                        return $rootScope.transactions[scope];
-                    },
-
-                    id: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction ? transaction.id : null;
-                    },
-
-                    operation: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction ? transaction.operation : null;
-                    },
-
-                    errorMessage: function () {
-                        return error.message();
-                    },
-
-                    begin: function (operation) {
-                        var transaction = $rootScope.transactions[scope];
-                        // Transaction already in progress
-                        if (transaction != null && transaction.id) {
-                            return null;
-                        }                      
-
-                        transaction = $rootScope.transactions[scope] = {
-                            id: new Date().getTime(),
-                            operation: operation || 'PROCESSING'
-                        };
-                        error.reset();
-
-                        return transaction.id;
-                    },
-
-                    abort: function() {
-                        var transaction = $rootScope.transactions[scope];
-                        if (transaction) {
-                            transaction.id = null;
-                        }
-                        error.reset();
-                    },
-
-                    end: function (err) {
-                        if (err) error.set(err);
-                        else error.reset();
-
-                        var transaction = $rootScope.transactions[scope];
-                        if (transaction != null) {
-                            transaction.id = null;
-                        }                      
-                    }
-                };
-
-                if (_.isObject(scopeObject)) {
-                    scopeObject.error = error;
-                    scopeObject.transaction = transaction;
-                }
-
-                return transaction;
-            }
-        }]
-    );
-
-})();
-
-/**
- * @file Translatation service
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo:
- * - Move directives to more appropriate places
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslate', ['LocalStorageModule', 'pipAssert']);
-
-    thisModule.provider('pipTranslate', ['pipAssertProvider', function(pipAssertProvider) {
-        var 
-            language = 'en',
-            persist = true,
-            setRoot = true,
-            translationMap = {
-                en: {
-                    'en': 'English',
-                    'ru': 'Russian',
-                    'es': 'Spanish',
-                    'pt': 'Portuguese',
-                    'de': 'German',
-                    'fr': 'French'
-                },
-                ru: {
-                    'en': 'Английский',
-                    'ru': 'Русский',
-                    'es': 'Испанский',
-                    'pt': 'Португальский',
-                    'de': 'Немецкий',
-                    'fr': 'Французский'
-                }
-            };
-
-        this.translations = setTranslations;
-        this.language = initLanguage;
-        this.use = initLanguage;
-        this.persist = initPersist;
-        this.setRoot = initSetRoot;
-
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
-            // Read language from persistent storage
-            if (persist)
-                language = localStorageService.get('language') || language;
-
-            // Set root variable
-            if (setRoot) 
-                $rootScope.$language = language;
-            
-            // Resetting root scope to force update language on the screen
-            function reset(fullReset, partialReset) {
-                fullReset = fullReset !== undefined ? !!fullReset : true;
-                partialReset = partialReset !== undefined ? !!partialReset : true;
-
-                $rootScope.$reset = fullReset;
-                $rootScope.$partialReset = partialReset;
-                $timeout(function() {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-
-            return {
-                use: function (newLanguage, fullReset, partialReset) {
-                    pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
-                    if (newLanguage != null && newLanguage != language) {
-                        language = newLanguage;
-                        if (persist)
-                            localStorageService.set('language', language);
-                        if (setRoot)
-                            $rootScope.$language = language;
-                        reset(fullReset, partialReset);
-                    }
-                    return language;
-                },
-
-                translations: setTranslations,
-                translate: translate,
-                translateArray: translateArray,
-                translateSet: translateSet,
-                translateObjects: translateObjects,
-                translateById: translateById,
-                translateSetById: translateSetById,
-                translateStringsSet: translateStringsSet
-            }
-        }];
-
-        // Initialize language selection
-        function initLanguage(newLanguage) {
-            pipAssertProvider.isString(newLanguage || '', "pipTranslateProvider.use or pipTranslateProvider.language: argument should be a string");
-
-            if (newLanguage != null) {
-                language = newLanguage;
-            }
-            return language;
-        }
-
-        // Initialize persistence flag
-        function initPersist(newPersist) {
-            if (newPersist != null) {
-                pipAssertProvider.isBoolean(newPersist || '', "pipTranslateProvider.persist: argument should be a boolean");
-                persist = newPersist;
-            }
-            return persist;
-        }
-
-        // Initialize set root flag
-        function initSetRoot(newSetRoot) {
-            if (newSetRoot != null) {
-                pipAssertProvider.isBoolean(newSetRoot || '', "pipTranslateProvider.setRoot: argument should be a boolean");
-                setRoot = newSetRoot;
-            }
-            return setRoot;  
-        }
-
-        // Set translation strings for specific language
-        function setTranslations(language, languageMap) {
-            pipAssertProvider.isString(language, "pipTranslate.setTranslations or pipTranslateProvider.translations: first argument should be a string");
-            pipAssertProvider.isObject(languageMap, "pipTranslate.setTranslations or pipTranslateProvider.translations: second argument should be an object");
-
-            var map = translationMap[language] || {};
-            translationMap[language] = _.extend(map, languageMap);
-        }
-
-        // Translate a string by key using set language
-        function translate(key) {
-            if (_.isNull(key) || _.isUndefined(key)) return '';
-
-            var map = translationMap[language] || {};
-            return map[key] || key;
-        }
-
-        // Translate an array of strings
-        function translateArray(keys) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateArray: argument should be an array");
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var key = k || '';
-                values.push(map[key] || key);
-            });
-
-            return values;
-        }
-
-        // Translate an array of strings into array of objects (set)
-        function translateSet(keys, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateSet: first argument should be an array");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateSet: second argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateSet: third argument should be a string");
-
-            key = key || 'id';
-            value = value || 'name';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-
-                obj[key] = mapKey;
-                obj[value] = map[mapKey] || mapKey;
-
-                values.push(obj);
-            });
-
-            return values;
-        }
-
-        // Translate a collection of objects
-        function translateObjects(items, key, value) {
-            if (_.isNull(items) || items.length == 0) return [];
-
-            pipAssertProvider.isArray(items, "pipTranslate.translateObjects: first argument should be an array");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateObjects: second argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateObjects: third argument should be a string");
-
-            key = key || 'name';
-            value = value || 'nameLocal';
-
-            var map = translationMap[language] || {};
-
-            _.each(items, function (i) {
-                var item = i, mapKey = item[key] || '';
-
-                item[value] = map[mapKey] || mapKey;
-            });
-
-            return items;
-        }
-
-        // Translate a string by key  with prefix using set language todo
-        function translateById(prefix, key) {
-            pipAssertProvider.isString(key || '', "pipTranslate.translateById: second argument should be a string");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateById: first argument should be a string");
-
-            prefix = prefix ? prefix + '_' : '';
-            key = (prefix + key).replace(/ /g, '_').toUpperCase();
-            if (key == null) return '';
-            var map = translationMap[language] || {};
-            return map[key] || key;
-        };
-
-        function translateSetById(keys, prefix, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateSetById: first argument should be an array");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateSetById: second argument should be a string");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateSetById: third argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateSetById: forth argument should be a string");
-
-            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
-            key = key || 'id';
-            value = value || 'name';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-
-                obj[key] = mapKey;
-                obj[value] = map[prefix + '_' + mapKey] || mapKey;
-
-                values.push(obj);
-            });
-
-            return values;
-        }
-
-        // Translate an array of strings, apply uppercase and replace ' ' => '_'
-        function translateStringsSet(keys, prefix, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateStringsSet: first argument should be an array");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateStringsSet: second argument should be a string");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateStringsSet: third argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateStringsSet: forth argument should be a string");
-
-            key = key || 'id';
-            value = value || 'name';
-            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_': '';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-                obj[key] = mapKey;
-                obj[value] = map[prefix + mapKey.replace(/ /g, '_').toUpperCase()]
-                    || (prefix + mapKey.replace(/ /g, '_').toUpperCase());
-
-                values.push(obj);
-            });
-
-            return values;
-        }
-    }]);
-
-    thisModule.directive('pipTranslate', ['pipTranslate', function(pipTranslate) {
-        return {
-            restrict: 'EA',
-            scope: {
-                key1: '@pipTranslate',
-                key2: '@key'
-            },
-            link: function (scope, element, attrs) {
-                var key = scope.key1 || scope.key2;
-                var value = pipTranslate.translate(key);
-                element.text(value);
-            }
-
-        };
-    }]);
-
-    thisModule.directive('pipTranslateHtml', ['pipTranslate', function(pipTranslate) {
-        return {
-            restrict: 'EA',
-            scope: {
-                key1: '@pipTranslateHtml',
-                key2: '@key'
-            },
-            link: function (scope, element, attrs) {
-                var key = scope.key1 || scope.key2;
-                var value = pipTranslate.translate(key);
-                element.html(value);
-            }
-
-        };
-    }]);
-
-})();
 //# sourceMappingURL=pip-webui-core.js.map
