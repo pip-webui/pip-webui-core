@@ -132,6 +132,8 @@
 
                     var _pressTimer = null;
 
+                    var _elementStyle = {};
+
                     var onDragStartCallback = $parse(attrs.pipDragStart) || null;
                     var onDragStopCallback = $parse(attrs.pipDragStop) || null;
                     var onDragSuccessCallback = $parse(attrs.pipDragSuccess) || null;
@@ -229,6 +231,8 @@
                             return;
                         }
 
+                        saveElementStyles();
+
                         if (_hasTouch) {
                             cancelPress();
                             _pressTimer = setTimeout(function () {
@@ -242,6 +246,13 @@
                         }
 
                     };
+
+                    function saveElementStyles() {
+                        _elementStyle.left = element.css('css');
+                        _elementStyle.top = element.css('top');
+                        _elementStyle.position = element.css('position');
+                        _elementStyle.width = element.css('width');                        
+                    }
 
                     var cancelPress = function () {
                         clearTimeout(_pressTimer);
@@ -384,8 +395,9 @@
                     var reset = function () {
                         if (allowTransform)
                             element.css({transform: '', 'z-index': '', '-webkit-transform': '', '-ms-transform': ''});
-                        else
-                            element.css({'position': '', top: '', left: '', 'z-index': '', width: ''});
+                        else {
+                            element.css({'position': _elementStyle.position, top: _elementStyle.top, left: _elementStyle.left, 'z-index': '', width: _elementStyle.width});
+                        }
                     };
 
                     var moveElement = function (x, y) {
