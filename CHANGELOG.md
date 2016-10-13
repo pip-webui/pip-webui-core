@@ -1,5 +1,7 @@
 # Pip.WebUI.Core Changelog
 
+Change pipDraggable: Add repare dragable element styles (left, top, position, width) after drop.
+
 ## <a name="1.0.0"></a> 1.0.0 (2016-07-30)
 
 Initial release with core services, behaviors and switching color themes

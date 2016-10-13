@@ -19,7 +19,6 @@
         'pipDebug',
         'pipTranslateFilters',
         'pipClearErrors',
-        'pipTheme',
 
         'pipFocused',
         'pipSelected',
