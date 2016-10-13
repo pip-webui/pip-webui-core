@@ -21,7 +21,6 @@
         'pipDateTimeFilters',
         'pipTranslateFilters',
         'pipClearErrors',
-        'pipTheme',
 
         'pipFocused',
         'pipSelected',
