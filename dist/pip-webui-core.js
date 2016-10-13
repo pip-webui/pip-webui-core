@@ -17,8 +17,6 @@
         'pipTimer',
         'pipAssert',
         'pipDebug',
-        'pipDateFormat',
-        'pipDateTimeFilters',
         'pipTranslateFilters',
         'pipClearErrors',
         'pipTheme',
@@ -32,6 +30,26 @@
     ]);
     
 })();
+/**
+ * @file Filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
+
+    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
+        return function (key) {
+            return pipTranslate.translate(key) || key;
+        }
+    }]);
+
+})();
+
 /**
  * @file Special error handling for forms
  * @copyright Digital Living Software Corp. 2014-2016
@@ -1290,8 +1308,106 @@
 
 })();
 /**
- * @file Date formatting service
+ * @file Collection utilities
  * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipUtils.Collections', []);
+
+    thisModule.factory('pipCollections', function () {
+        var collections = {};
+
+        // Index of element in array by key
+        collections.indexBy = function (items, key, value) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    return i;
+                }
+            }
+            return null;
+        };
+    
+        // Find element in array by key
+        collections.findBy = function (items, key, value) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    return items[i];
+                }
+            }
+            return null;
+        };
+    
+        // Remove element from array by value
+        collections.remove = function (items, item) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i] == item) {
+                    items.splice(i, 1);
+                    i--;
+                }
+            }
+        };
+    
+        // Removes element from array by key
+        collections.removeBy = function (items, key, value) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    items.splice(i, 1);
+                    i--;
+                }
+            }
+        };
+    
+        // Replaced element by key
+        collections.replaceBy = function (items, key, value, data) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    items[i] = data;
+                    return;
+                }
+            }
+        };
+    
+        // Calculate difference between two collections
+        collections.difference = function (a1, a2, comparator) {
+            var result = [];
+    
+            _.each(a1, function (e1) {
+                var e2 = _.find(a2, function (e) {
+                    return comparator(e1, e);
+                });
+    
+                if (e2 == null) {
+                    result.push(e1);
+                }
+            })
+    
+            return result;
+        };
+
+        return collections;
+    });
+
+})();
+
+/**
+ * @file Form error utilities
+ * @copyright Digital Living Software Corp. 2014-2016
+ *
  */
  
  /* global _, angular */
@@ -1299,705 +1415,776 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipUtils.FormErrors', []);
 
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.factory('pipFormErrors', ['$rootScope', function ($rootScope) {
+		return {
+			errorsWithHint: errorsWithHint,
+            //submittedErrors: submittedErrors,
+            //submittedErrorsWithHint: submittedErrorsWithHint,
+            //dirtyErrors: dirtyErrors,
+            //dirtyErrorsWithHint: dirtyErrorsWithHint,
+            //touchedErrors: touchedErrors,            
+            touchedErrorsWithHint: touchedErrorsWithHint,
+            resetFormErrors: resetFormErrors,
+            setFormError: setFormError,
+            resetFieldsErrors: resetFieldsErrors
+		};
+		//-------------------
 
-        pipTranslateProvider.translations('en', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'January',
-            'MONTH_2': 'February',
-            'MONTH_3': 'March',
-            'MONTH_4': 'April',
-            'MONTH_5': 'May',
-            'MONTH_6': 'June',
-            'MONTH_7': 'July',
-            'MONTH_8': 'August',
-            'MONTH_9': 'September',
-            'MONTH_10': 'October',
-            'MONTH_11': 'November',
-            'MONTH_12': 'December',
-
-            'MONTH_LONG_1': 'January',
-            'MONTH_LONG_2': 'February',
-            'MONTH_LONG_3': 'March',
-            'MONTH_LONG_4': 'April',
-            'MONTH_LONG_5': 'May',
-            'MONTH_LONG_6': 'June',
-            'MONTH_LONG_7': 'July',
-            'MONTH_LONG_8': 'August',
-            'MONTH_LONG_9': 'September',
-            'MONTH_LONG_10': 'October',
-            'MONTH_LONG_11': 'November',
-            'MONTH_LONG_12': 'December',
-
-            'MONTH_SHORT_1': 'Jan',
-            'MONTH_SHORT_2': 'Feb',
-            'MONTH_SHORT_3': 'Mar',
-            'MONTH_SHORT_4': 'Apr',
-            'MONTH_SHORT_5': 'May',
-            'MONTH_SHORT_6': 'Jun',
-            'MONTH_SHORT_7': 'Jul',
-            'MONTH_SHORT_8': 'Aug',
-            'MONTH_SHORT_9': 'Sep',
-            'MONTH_SHORT_10': 'Oct',
-            'MONTH_SHORT_11': 'Nov',
-            'MONTH_SHORT_12': 'Dec',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'Monday',
-            'DAY_2': 'Tuesday',
-            'DAY_3': 'Wednesday',
-            'DAY_4': 'Thursday',
-            'DAY_5': 'Friday',
-            'DAY_6': 'Saturday',
-            'DAY_7': 'Sunday',
-
-            'ELAPSED_TODAY': 'Today',
-            'ELAPSED_YESTERDAY': 'Yesterday',
-            'ELAPSED_YEARS': 'y',
-            'ELAPSED_MONTHS': 'mth',
-            'ELAPSED_WEEKS': 'w',
-            'ELAPSED_DAYS': 'd',
-            'ELAPSED_HOURS': 'h',
-            'ELAPSED_MINUTES': 'm',
-            'ELAPSED_SECONDS': 's',
-            'ELAPSED_AT': 'at',
-            'ELAPSED_AGO': 'ago',
-            'ELAPSED_JUST_NOW': 'Just now',
-            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
-            'ELAPSED_MIN_AGO': 'min ago',
-            'ELAPSED_HOUR_AGO': 'hour ago',
-            'ELAPSED_HOURS_AGO': 'hours ago',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'январь',
-            'MONTH_2': 'февраль',
-            'MONTH_3': 'март',
-            'MONTH_4': 'апрель',
-            'MONTH_5': 'май',
-            'MONTH_6': 'июнь',
-            'MONTH_7': 'июль',
-            'MONTH_8': 'август',
-            'MONTH_9': 'сентябрь',
-            'MONTH_10': 'октябрь',
-            'MONTH_11': 'ноябрь',
-            'MONTH_12': 'декабрь',
-
-            'MONTH_LONG_1': 'января',
-            'MONTH_LONG_2': 'февраля',
-            'MONTH_LONG_3': 'марта',
-            'MONTH_LONG_4': 'апреля',
-            'MONTH_LONG_5': 'мая',
-            'MONTH_LONG_6': 'июня',
-            'MONTH_LONG_7': 'июля',
-            'MONTH_LONG_8': 'августа',
-            'MONTH_LONG_9': 'сентября',
-            'MONTH_LONG_10': 'октября',
-            'MONTH_LONG_11': 'ноября',
-            'MONTH_LONG_12': 'декабря',
-
-            'MONTH_SHORT_1': 'янв',
-            'MONTH_SHORT_2': 'фев',
-            'MONTH_SHORT_3': 'мар',
-            'MONTH_SHORT_4': 'апр',
-            'MONTH_SHORT_5': 'май',
-            'MONTH_SHORT_6': 'июн',
-            'MONTH_SHORT_7': 'июл',
-            'MONTH_SHORT_8': 'авг',
-            'MONTH_SHORT_9': 'сен',
-            'MONTH_SHORT_10': 'окт',
-            'MONTH_SHORT_11': 'ноя',
-            'MONTH_SHORT_12': 'дек',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'понедельник',
-            'DAY_2': 'вторник',
-            'DAY_3': 'среда',
-            'DAY_4': 'четверг',
-            'DAY_5': 'пятница',
-            'DAY_6': 'суббота',
-            'DAY_7': 'воскресенье',
-
-            'ELAPSED_TODAY': 'Сегодня',
-            'ELAPSED_YESTERDAY': 'Вчера',
-            'ELAPSED_YEARS': 'г',
-            'ELAPSED_MONTHS': 'мц',
-            'ELAPSED_WEEKS': 'н',
-            'ELAPSED_DAYS': 'д',
-            'ELAPSED_HOURS': 'ч',
-            'ELAPSED_MINUTES': 'м',
-            'ELAPSED_SECONDS': 'с',
-            'ELAPSED_AT': 'в',
-            'ELAPSED_AGO': 'тн',
-            'ELAPSED_JUST_NOW': 'Только что',
-            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
-            'ELAPSED_MIN_AGO': 'мин тн',
-            'ELAPSED_HOUR_AGO': 'час тн',
-            'ELAPSED_HOURS_AGO': 'часа тн',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
-        });
+        function errorsWithHint(field) {
+            if (field == null) return;
+			
+            return _.isEmpty(field.$error) ? { hint: true } : field.$error;
+        };
 		
+//         function submittedErrors(form, field) {
+//             if (form == null) throw new Error('Form is not set');
+//             if (field == null) throw new Error('Field is not set');
+// 
+//             if (form.$submitted)
+//                 return field.$error;
+//             return {};
+//         };
+// 
+//         function submittedErrorsWithHint(form, field) {
+//             if (form == null) throw new Error('Form is not set');
+//             if (field == null) throw new Error('Field is not set');
+// 
+//             if (form.$submitted) {
+//                 return _.isEmpty(field.$error) ? { hint: true} : field.$error;
+//             }
+//             return { hint: true };
+//         };
+// 
+//         function dirtyErrors(form, field) {
+//             if (form == null) throw new Error('Form is not set');
+//             if (field == null) throw new Error('Field is not set');
+// 
+//             if (field.$dirty || form.$dirty)
+//                 return field.$error;
+//             return {};
+//         };
+// 
+//         function dirtyErrorsWithHint(form, field) {
+//             if (form == null) throw new Error('Form is not set');
+//             if (field == null) throw new Error('Field is not set');
+// 
+//             if (field.$dirty || form.$dirty) {
+//                 return _.isEmpty(field.$error) ? { hint: true} : field.$error;
+//             }
+//             return { hint: true };
+//         };
+// 
+//         function touchedErrors(form, field) {
+//             if (form == null) throw new Error('Form is not set');
+//             if (field == null) throw new Error('Field is not set');
+//             
+//             if (field.$touched || form.$dirty)
+//                 return field.$error;
+//             return {};
+//         };
+
+        function touchedErrorsWithHint(form, field) {
+            if (form == null) return;
+            if (field == null) return;
+
+            if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
+                var result = _.isEmpty(field.$error) ? { hint: true} : field.$error;
+                return result;
+            }
+            return { hint: true };
+        };
+
+        function resetFormErrors(form, errors) {
+            form.$setPristine();
+            form.$setUntouched();
+
+            if (errors) {
+                form.$setDirty();
+                form.$setSubmitted();
+            }
+
+            form.$serverError = {};
+        };
+        
+        function resetFieldsErrors(form, field) {
+            if (!form) return;
+            if (field && form[field] && form[field].$error) {
+                 form[field].$error = {};
+            } else {
+                for (var prop in form) {
+                    if (form[prop] && form[prop].$error) {
+                        form[prop].$error = {};
+                    };
+                }
+                if (form && form.$error) form.$error = {};
+            }
+        };
+        
+        function setFormError(form, error, errorFieldMap) {
+            if (error == null) return;
+            // Prepare form server errors
+            form.$serverError = form.$serverError || {};
+            // Prepare error code
+            var code = error.code || (error.data || {}).code || null;
+            if (!code && error.status) code = error.status;
+
+            if (code) {
+                var 
+                    errorName = 'ERROR_' + code,
+                    field = errorFieldMap ? errorFieldMap[code] : null;
+                // Set server error to fields
+                if (field && form[field] && form[field].$setValidity) {
+                    form[field].$setValidity(errorName, false);
+                    return;
+                }
+
+                // Set server error to form
+                if (field == 'form') {
+                    form.$serverError[errorName] = true;
+                    return;
+                }
+            }
+
+            // if undefined error for this form or code === undefined/null, go to unhandled error page
+            if (error.data && error.data.message) {
+                form.$serverError['ERROR_UNKNOWN'] = error.data.message;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+
+            // Set as undefined error
+            if (error.message) {
+                form.$serverError['ERROR_UNKNOWN'] = error.message;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+
+            if (error.name) {
+                form.$serverError['ERROR_UNKNOWN'] = error.name;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+
+            form.$serverError['ERROR_UNKNOWN'] = error;
+            goToUnhandledErrorPage(error);
+        };
+
+        function goToUnhandledErrorPage(error) {
+            $rootScope.$emit('pipUnhandledInternalError', {
+                error: error
+            });
+        };
+        
 	}]);
 
-    thisModule.factory('pipDateFormat',
-        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
-
-            return {
-                formatDate: formatDate,
-                formatLongDate: formatLongDate,
-                formatShortDate: formatShortDate,
-                formatShortDateWithYear: formatShortDateWithYear,
-                formatLongDateWithYear: formatLongDateWithYear,
-
-                formatLongMonth: formatLongMonth,
-                formatMonth: formatMonth,
-                formatYear: formatYear,
-                formatShortWeek: formatShortWeek,
-                formatShortDayAndMonth: formatShortDayAndMonth,
-                formatLongDayAndMonth: formatLongDayAndMonth,
-
-                formatDateRange: formatDateRange,
-                formatDateTimeRange: formatDateTimeRange,
-
-                formatTime: formatTime,
-                formatLongTime: formatLongTime,
-                formatShortTime: formatShortTime, 
-
-                formatLongDateTime: formatLongDateTime,
-                formatShortDateTime: formatShortDateTime,
-
-                formatElapsedTime: formatElapsedTime,
-                formatElapsedInterval: formatElapsedInterval,
-
-                formatMillisecondsToSeconds: formatMillisecondsToSeconds
-            };
-
-
-            function twoDigits(value) {
-                return value < 10 ? '0' + value : value; 
-            };
-
-            function formatDate(value, format, str) {
-                if (value == null) return '';
-
-                var
-                    strict = str || false,
-                    value = _.isDate(value) ? value : new Date(value),
-                    thisYear = new Date().getUTCFullYear(),
-                    year = value.getUTCFullYear(),
-                    month = value.getUTCMonth(),
-                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
-                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
-                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
-                    day = value.getUTCDate(),
-                    startWeek = pipDates.toStartWeek(value),
-                    endWeek = pipDates.toEndWeek(value, -1);
-
-                if (strict == false && format == 'd MMMM yyyy' && thisYear === year) {
-                        format = 'MMMM d';
-                }
-                if (strict == false && format == 'd MMM yyyy' && thisYear === year) {
-                        format = 'MMM d';
-                }
-                if ((format == 'MMM d') && $rootScope.$language == 'ru') {
-                        format = 'd MMM';
-                }
-                if ((format == 'MMMM d') && $rootScope.$language == 'ru') {
-                    format = 'd MMMM';
-                }
-
-                if (format == 'd MMMM yyyy')
-                    return '' + day + ' ' + longMonthName + ' ' + year
-                else if (format == 'MMMM d, yyyy')
-                    return '' + monthName + ' ' + day + ', ' + year
-                if (format == 'd MMM yyyy')
-                    return '' + day + ' ' + shortMonthName + ' ' + year
-                else if (format == 'MMM d, yyyy')
-                    return '' + shortMonthName + ' ' + day + ', ' + year
-                else if (format == 'd MMMM')
-                    return '' + day + ' ' + longMonthName
-                else if (format == 'd MMM')
-                    return '' + day + ' ' + shortMonthName
-                else if (format == 'MMM d')
-                    return '' + shortMonthName + ' ' + day;
-                else if (format == 'MMMM d')
-                    return '' + longMonthName + ' ' + day;
-                else if (format == 'yyyy/M/d')
-                    return '' + year + '/' + month + '/' + day;
-                else if (format == 'yyy-M-d')
-                    return '' + year + '-' + month + '-' + day;
-                else if (format == 'MMMM')
-                    return '' + longMonthName + ' ' + year;
-                else if (format == 'yyyy')
-                    return '' + year;
-                else if (format == 'ww')
-                    return '' + startWeek.getUTCDate() + ' - ' + endWeek.getUTCDate() + ' ' + monthName + ' ' + year;
-
-                return '' + day + ' ' + monthName + ' ' + year
-            }
-
-            function formatLongDate(value) {
-                return formatDate(value, 'd MMMM yyyy');
-            }
-
-            function formatShortDateWithYear(value) {
-                return formatDate(value, 'd MMM yyyy', true);
-            }
-
-            function formatLongDateWithYear(value) {
-                return formatDate(value, 'd MMMM yyyy', true);
-            }
-
-            function formatShortDate(value) {
-                return formatDate(value, 'd MMM yyyy');
-            }
-
-            function formatLongMonth(value) {
-                return formatDate(value, 'MMMM');
-            }
-
-            function formatYear(value) {
-                return formatDate(value, 'yyyy');
-            }
-
-            function formatShortWeek(value) {
-                return formatDate(value, 'ww');
-            }
-
-            function formatShortDayAndMonth(value) {
-                return formatDate(value, 'd MMM');
-            }
-
-            function formatLongDayAndMonth(value) {
-                if ($rootScope.$language == 'ru')
-                    return formatDate(value, 'd MMMM');
-                else
-                    return formatDate(value, 'MMMM d');
-            }
-
-            function formatDateRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-
-                if (value1 == null) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value2, 'MMM d, yyyy', true);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true);
-                }
-
-                if (value1.getUTCFullYear() !== value2.getUTCFullYear()) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true) + '-' + formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true) + '-' + formatDate(value2, 'MMM d, yyyy', true);
-                } else {
-                        return formatDate(value1, 'd MMM') + ' - ' + formatDate(value2, 'd MMM')
-                            + ((new Date().getUTCFullYear() !== value1.getUTCFullYear()) ? ' ' + formatDate(value1, 'yyyy') : '');
-                }
-            }
-
-            function formatDateTimeRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-                if (value1 == null && value2 == null) return '';
-
-                if (value1 == null) {
-                    return formatShortDateTime(value2);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    return formatShortDateTime(value1);
-                }
-
-                var dayStart, monthStart, yearStart,
-                    dayEnd, monthEnd, yearEnd;
-
-                dayStart = value1.getUTCDate();
-                monthStart = value1.getUTCMonth();
-                yearStart = value1.getUTCFullYear();
-                dayEnd = value2.getUTCDate();
-                monthEnd = value2.getUTCMonth();
-                yearEnd = value2.getUTCFullYear();
-
-
-                if (yearStart !== yearEnd) {
-                    return formatDate(value1, 'd MMM') + ', ' + yearStart + ' ' + formatTime(value1, 'hh:mm') +
-                        ' - ' + formatDate(value2, 'd MMM') + ', ' + yearEnd + ' ' + formatTime(value2, 'hh:mm');
-                } else {
-                    if (monthStart != monthEnd && !dayStart != dayEnd)
-                        return formatDate(value1, 'd MMM') + ', ' + formatTime(value1, 'hh:mm') +
-                            ' - ' + formatDate(value2, 'd MMM') + ', ' + formatTime(value2, 'hh:mm');
-                    else
-                        return formatTime(value1, 'hh:mm') + ' - ' + formatTime(value2, 'hh:mm')
-                }
-            }
-
-            function formatTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-                
-                var 
-                    hours = value.getHours(),
-                    mins = value.getMinutes(),
-                    secs = value.getSeconds(),
-                    ampm = '';
-
-                if (pipTranslate.use() == 'en') {
-                    ampm = hours >= 12 ? ' PM' : ' AM';
-                    hours = hours % 12;
-                    if (hours == 0) hours = 12;
-                }
-
-                if (format == 'hh:mm:ss')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-                else if (format == 'hh:mm')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ampm;
-
-                return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-            }
-
-            function formatMonth(value, short) {
-                if (value == null) return '';
-                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
-            }
-
-            function formatLongTime(value) {
-                return formatTime(value, 'hh:mm:ss');
-            }
-
-            function formatShortTime(value) {
-                return formatTime(value, 'hh:mm');
-            }
-
-            function formatLongDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatLongDate(value) + ' ' + formatLongTime(value);
-            }
-
-            function formatShortDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatShortDate(value) + ' ' + formatShortTime(value);
-            }
-
-            function formatElapsedTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-
-                var 
-                    current = new Date(),
-                    diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
-
-                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
-
-                var years, months, weeks, days, hours, mins, secs;
-
-                secs = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                mins = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                hours = diff % 24;
-
-                diff = diff / 24;
-                years = Math.floor(diff / 365),
-
-                diff = diff - years * 365;
-                months = Math.floor(diff / 30),
-                days = Math.floor(diff - months * 30);
-
-                if (days % 7 == 0) {
-                    weeks = Math.floor(days / 7);
-                    days = 0;
-                } else {
-                    weeks = 0;
-                }
-
-                if (format == 'interval') {
-                    var result = '';
-
-                    if (years) {
-                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
-                        weeks = days = hours = mins = secs = null;
-                    }
-                    if (months) {
-                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
-                        days = hours = mins = secs = null;
-                    }
-                    if (weeks) {
-                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
-                        hours = mins = secs = null;
-                    }
-                    if (days) {
-                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
-                        mins = secs = null;
-                    }
-                    if (hours) {
-                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
-                        secs = null;
-                    }
-                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
-                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
-
-                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
-                        : pipTranslate.translate('ELAPSED_JUST_NOW');
-                }
-
-                // Default time format = 'default'
-
-                if (years > 0) {
-                    return formatDate(value, 'd MMM yyyy');
-                }
-
-                if (months > 0 || weeks > 0 || days > 1) {
-                    return formatDate(value, 'MMM d') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (days == 1) {
-                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 10) {
-                    return pipTranslate.translate('ELAPSED_TODAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 0) {
-                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
-                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
-                }
-
-                if (mins > 10) {
-                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
-                }
-
-                if (mins > 0) {
-                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
-                }
-
-                return pipTranslate.translate('ELAPSED_JUST_NOW');
-            }
-
-            function formatElapsedInterval(value) {
-                return formatElapsedTime(value, 'interval');  
-            }
-
-            function formatMillisecondsToSeconds(value) {
-                return Math.floor(value / 1000)
-            }
-
-        }]
-    );
-    
 })();
-
 /**
- * @file Filter to format date and time
+ * @file General purpose utilities
  * @copyright Digital Living Software Corp. 2014-2016
  */
- 
-/* global angular */
+
+/* global _, $, angular */
 
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
+    var thisModule = angular.module('pipUtils.General', ['pipState', 'pipAssert']);
 
-    thisModule.filter('formatDate',  
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatDate(value, format);  
-            };
-        }]
-    );
+    thisModule.factory('pipUtils', ['$rootScope', '$window', '$state', 'pipAssert', function ($rootScope, $window, $state, pipAssert) {
 
-    thisModule.filter('formatLongDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatMonth(value, format);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongMonth(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortWeek',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortWeek(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatTime(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedInterval', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedInterval(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatMillisecondsToSeconds',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatMillisecondsToSeconds(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateRange(value1, value2);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateTimeRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateTimeRange(value1, value2);
-            };
-        }]
-    );
-
-
-})();
-
-/**
- * @file Filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
-
-    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
-        return function (key) {
-            return pipTranslate.translate(key) || key;
+        function strRepeat(str, qty) {
+            if (qty < 1) return '';
+            var result = '';
+            while (qty > 0) {
+                if (qty & 1) result += str;
+                qty >>= 1, str += str;
+            }
+            return result;
         }
+
+        var toString = Object.prototype.toString;
+
+        var sprintf = (function sprintf() {
+            function get_type(variable) {
+                return toString.call(variable).slice(8, -1).toLowerCase();
+            }
+
+            var str_repeat = strRepeat;
+
+            var str_format = function() {
+                if (!str_format.cache.hasOwnProperty(arguments[0])) {
+                    str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
+                }
+                return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
+            };
+
+            str_format.format = function(parse_tree, argv) {
+                var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
+                for (i = 0; i < tree_length; i++) {
+                    node_type = get_type(parse_tree[i]);
+                    if (node_type === 'string') {
+                        output.push(parse_tree[i]);
+                    }
+                    else if (node_type === 'array') {
+                        match = parse_tree[i]; // convenience purposes only
+                        if (match[2]) { // keyword argument
+                            arg = argv[cursor];
+                            for (k = 0; k < match[2].length; k++) {
+                                if (!arg.hasOwnProperty(match[2][k])) {
+                                    throw new Error(sprintf('[_.sprintf] property "%s" does not exist', match[2][k]));
+                                }
+                                arg = arg[match[2][k]];
+                            }
+                        } else if (match[1]) { // positional argument (explicit)
+                            arg = argv[match[1]];
+                        }
+                        else { // positional argument (implicit)
+                            arg = argv[cursor++];
+                        }
+
+                        if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
+                            throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
+                        }
+                        switch (match[8]) {
+                            case 'b': arg = arg.toString(2); break;
+                            case 'c': arg = String.fromCharCode(arg); break;
+                            case 'd': arg = parseInt(arg, 10); break;
+                            case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
+                            case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
+                            case 'o': arg = arg.toString(8); break;
+                            case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
+                            case 'u': arg = Math.abs(arg); break;
+                            case 'x': arg = arg.toString(16); break;
+                            case 'X': arg = arg.toString(16).toUpperCase(); break;
+                        }
+                        arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
+                        pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
+                        pad_length = match[6] - String(arg).length;
+                        pad = match[6] ? str_repeat(pad_character, pad_length) : '';
+                        output.push(match[5] ? arg + pad : pad + arg);
+                    }
+                }
+                return output.join('');
+            };
+
+            str_format.cache = {};
+
+            str_format.parse = function(fmt) {
+                var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
+                while (_fmt) {
+                    if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
+                        parse_tree.push(match[0]);
+                    }
+                    else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
+                        parse_tree.push('%');
+                    }
+                    else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
+                        if (match[2]) {
+                            arg_names |= 1;
+                            var field_list = [], replacement_field = match[2], field_match = [];
+                            if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                                field_list.push(field_match[1]);
+                                while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+                                    if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                                        field_list.push(field_match[1]);
+                                    }
+                                    else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
+                                        field_list.push(field_match[1]);
+                                    }
+                                    else {
+                                        throw new Error('[_.sprintf] huh?');
+                                    }
+                                }
+                            }
+                            else {
+                                throw new Error('[_.sprintf] huh?');
+                            }
+                            match[2] = field_list;
+                        }
+                        else {
+                            arg_names |= 2;
+                        }
+                        if (arg_names === 3) {
+                            throw new Error('[_.sprintf] mixing positional and named placeholders is not (yet) supported');
+                        }
+                        parse_tree.push(match);
+                    }
+                    else {
+                        throw new Error('[_.sprintf] huh?');
+                    }
+                    _fmt = _fmt.substring(match[0].length);
+                }
+                return parse_tree;
+            };
+
+            return str_format;
+        })();
+
+        return {
+            copyProperty: copyProperty,
+            copy: copyProperty,
+            swapProperties: swapProperties,
+            swap: swapProperties,
+            convertToBoolean: convertToBoolean,
+            toBoolean: convertToBoolean,
+            toBool: convertToBoolean,
+            convertObjectIdsToString: convertObjectIdsToString,
+            OidToString: convertObjectIdsToString,
+            generateVerificationCode: generateVerificationCode,
+            vercode: generateVerificationCode,
+            goBack: goBack,
+            goBackAndSelect: goBackAndSelect,
+            scrollTo: scrollTo,
+            equalObjectIds: equalObjectIds,
+            eqOid: equalObjectIds,
+            notEqualObjectIds: notEqualObjectIds,
+            neqOid: notEqualObjectIds,
+            containsObjectId: containsObjectId,
+            hasOid: containsObjectId,
+            isObjectId: isObjectId,
+            // Strings functions. No analogues in lodash.strings
+            sampleLine: sampleLine,
+            hashCode: hashCode,
+            makeString: makeString,
+            getBrowser: getBrowser,
+            checkSupported: checkSupported,
+            sprintf: sprintf,
+            // Collection function. No analogues in lodash. It may be in lodash later. Look gitHub/lodash issue #1022
+            replaceBy: replaceBy
+        };
+        
+        //--------------------
+        function replaceBy(items, key, value, data) {
+            if (!items || !items.length)
+                return null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    items[i] = data;
+                    return;
+                }
+            }
+        };
+
+        // Creates a sample line from a text
+        function sampleLine(value, maxLength) {
+            if (!value || value == '') return '';
+
+            var length = value.indexOf('\n');
+            length = length >= 0 ? length : value.length;
+            length = length < maxLength ? value.length : maxLength;
+
+            return value.substring(0, length);
+        };
+
+        // Simple version of string hashcode
+        function hashCode(value) {
+            if (value == null) return 0;
+            var result = 0;
+            for (var i = 0; i < value.length; i++) {
+                result += value.charCodeAt(i);
+            }
+            return result;
+        };
+
+        // Ensure some object is a coerced to a string
+        function makeString(object) {
+            if (object == null) return '';
+            return '' + object;
+        };
+
+        function isObjectId(value) {
+            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+            return checkForHexRegExp.test(value);
+        }
+
+        // Compares two ObjectIds (they are not equal by '==')
+        function equalObjectIds(value1, value2) {
+            if (value1 == null && value2 == null)
+                return true;
+
+            if (value1 == null || value2 == null)
+                return false;
+
+            return value1.toString() == value2.toString();
+        };
+
+        // Compares two ObjectIds (they are always not equal by '!=')
+        function notEqualObjectIds(value1, value2) {
+            if (value1 == null && value2 == null)
+                return false;
+
+            if (value1 == null || value2 == null)
+                return true;
+
+            return value1.toString() != value2.toString();
+        };
+
+        // Checks if array contains concrete objectId
+        function containsObjectId(values, value) {
+            return _.some(values, function (value1) {
+                return equalObjectIds(value1, value);
+            });
+        };
+
+        // Copy property from one object to another if it exists (not null)
+        function copyProperty(dest, destProperty, orig, origProperty) {
+            // Shift if only 3 arguments set
+            if (_.isObject(destProperty)
+                && typeof (origProperty) == 'undefined') {
+                origProperty = orig;
+                orig = destProperty;
+                destProperty = origProperty;
+            }
+    
+            if (orig[origProperty] || (typeof (orig[origProperty]) === 'number' && orig[origProperty] % 1 == 0)) {
+                dest[destProperty] = orig[origProperty];
+                return true;
+            }
+    
+            return false;
+        };
+    
+        // Swaps values of two properties
+        function swapProperties(obj, prop1, prop2) {
+            var 
+                temp1 = obj[prop1],
+                temp2 = obj[prop2];
+    
+            if (temp1) {
+                obj[prop2] = temp1;
+            }
+            else {
+                delete obj[prop2];
+            }
+    
+            if (temp2) {
+                obj[prop1] = temp2;
+            }
+            else {
+                delete obj[prop1];
+            }
+        };
+    
+        // Converts value into boolean
+        function convertToBoolean(value) {
+            if (value == null) return false;
+            if (!value) return false;
+            value = value.toString().toLowerCase();
+            return value == '1' || value == 'true';
+        };
+    
+        // Converts array of object ids to strings (for comparison)
+        function convertObjectIdsToString(values) {
+            return _.map(values, function (value) {
+                return value ? value.toString() : 0;
+            });
+        };
+
+        // Generates random big number for verification codes
+        function generateVerificationCode() {
+            return Math.random().toString(36).substr(2, 10).toUpperCase(); // remove `0.`
+        };
+
+        // Navigation
+        //-------------
+
+        function goBack() {
+            $window.history.back()
+        };
+
+        function goBackAndSelect(object, idParamName, objParamName) {
+            pipAssert.isDef(object, 'pipUtils.goBack: first argument should be defined');
+            pipAssert.isDef(idParamName, 'pipUtils.goBack: second argument should be defined');
+            pipAssert.isDef(objParamName, 'pipUtils.goBack: third argument should be defined');
+            pipAssert.isObject(object, 'pipUtils.goBack: first argument should be an object');
+            pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
+            pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
+                
+            if ($rootScope.$prevState && $rootScope.$prevState.name) {
+                var state = _.cloneDeep($rootScope.$prevState);
+
+                state.params[idParamName] = object.id;
+                state.params[objParamName] = object;
+
+                $state.go(state.name, state.params);
+            } else {
+                $window.history.back();
+            }
+        };
+
+        // Scrolling
+        //--------------
+        
+        function scrollTo(parentElement, childElement, animationDuration) {
+            if(!parentElement || !childElement) return;
+            if (animationDuration == undefined) animationDuration = 300;
+
+            setTimeout(function () {
+                if (!$(childElement).position()) return;
+                var modDiff= Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
+                if (modDiff < 20) return;
+                var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
+                if (animationDuration > 0)
+                    $(parentElement).animate({
+                        scrollTop: scrollTo + 'px'
+                    }, animationDuration);
+            }, 100);
+        };
+
+        // todo add support for iPhone
+        function getBrowser() {
+            var ua = $window.navigator.userAgent;
+
+            var bName = function () {
+                if (ua.search(/Edge/) > -1) return "edge";
+                if (ua.search(/MSIE/) > -1) return "ie";
+                if (ua.search(/Trident/) > -1) return "ie11";
+                if (ua.search(/Firefox/) > -1) return "firefox";
+                if (ua.search(/Opera/) > -1) return "opera";
+                if (ua.search(/OPR/) > -1) return "operaWebkit";
+                if (ua.search(/YaBrowser/) > -1) return "yabrowser";
+                if (ua.search(/Chrome/) > -1) return "chrome";
+                if (ua.search(/Safari/) > -1) return "safari";
+                if (ua.search(/Maxthon/) > -1) return "maxthon";
+            }();
+
+            var version;
+            switch (bName) {
+                case "edge":
+                    version = (ua.split("Edge")[1]).split("/")[1];
+                    break;
+                case "ie":
+                    version = (ua.split("MSIE ")[1]).split(";")[0];
+                    break;
+                case "ie11":
+                    bName = "ie";
+                    version = (ua.split("; rv:")[1]).split(")")[0];
+                    break;
+                case "firefox":
+                    version = ua.split("Firefox/")[1];
+                    break;
+                case "opera":
+                    version = ua.split("Version/")[1];
+                    break;
+                case "operaWebkit":
+                    bName = "opera";
+                    version = ua.split("OPR/")[1];
+                    break;
+                case "yabrowser":
+                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
+                    break;
+                case "chrome":
+                    version = (ua.split("Chrome/")[1]).split(" ")[0];
+                    break;
+                case "safari":
+                    version = (ua.split("Version/")[1]).split(" ")[0];
+                    break;
+                case "maxthon":
+                    version = ua.split("Maxthon/")[1];
+                    break;
+            }
+
+            var platform = 'desktop';
+            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase())) platform = 'mobile';
+
+            var os;
+            try {
+                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [u])[0].replace('sunos', 'solaris'),
+                    osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+                    os = osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
+            } catch (err) {
+                os = 'unknown'
+            }
+
+            var browsrObj;
+
+            try {
+                browsrObj = {
+                    platform: platform,
+                    browser: bName,
+                    versionFull: version,
+                    versionShort: version.split(".")[0],
+                    os: os
+                };
+            } catch (err) {
+                browsrObj = {
+                    platform: platform,
+                    browser: 'unknown',
+                    versionFull: 'unknown',
+                    versionShort: 'unknown',
+                    os: 'unknown'
+                };
+            }
+
+            return browsrObj;
+        }
+
+        // todo нужны каке нибудь настройки?
+        function checkSupported(supported) {
+            if (!supported) supported = {
+                edge: 11,
+                ie: 11,
+                firefox: 43, //4, for testing
+                opera: 35,
+                chrome: 47
+            };
+
+            var systemInfo = getBrowser();
+
+            if (systemInfo && systemInfo.browser && supported[systemInfo.browser]){
+                if (systemInfo.versionShort >= supported[systemInfo.browser]) return true;
+            }
+            return true;
+
+        };
+
     }]);
 
+})();
+
+/**
+ * @file String utilities
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Move functions to general utilities
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipUtils.Strings', []);
+
+    thisModule.factory('pipStrings', function () {
+        var strings = {};
+
+        // Creates a sample line from a text
+        strings.sampleLine = function (value, maxLength) {
+            if (!value || value == '') return '';
+    
+            var length = value.indexOf('\n');
+            length = length >= 0 ? length : value.length;
+            length = length < maxLength ? value.length : maxLength;
+    
+            return value.substring(0, length);
+        };
+    
+        // Simple version of string hashcode
+        strings.hashCode = function (value) {
+            if (value == null) return 0;
+            var result = 0;
+            for (var i = 0; i < value.length; i++) {
+                result += value.charCodeAt(i);
+            }
+            return result;
+        };
+    
+        return strings;
+    });
+
+})();
+/**
+ * @file Search tag utilities
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipUtils.Tags', []);
+
+    thisModule.factory('pipTags', function () {
+        var tags = {};
+        
+        var HASHTAG_REGEX = /#\w+/g;
+    
+        var normalizeTag = function (tag) {
+            return tag 
+                ? _.trim(tag.replace(/(_|#)+/g, ' '))
+                : null;
+        };
+        tags.normalizeTag = normalizeTag;
+    
+        var compressTag = function (tag) {
+            return tag
+                ? tag.replace(/( |_|#)/g, '').toLowerCase()
+                : null;
+        };
+        tags.compressTag = compressTag;
+    
+        var equalTags = function (tag1, tag2) {
+            if (tag1 == null && tag2 == null)
+                return true;
+            if (tag1 == null || tag2 == null)
+                return false;
+            return compressTag(tag1) == compressTag(tag2);
+        };
+        tags.equalTags = equalTags;
+    
+        var normalizeTags = function (tags) {
+            if (_.isString(tags)) {
+                tags = tags.split(/( |,|;)+/);
+            }
+    
+            tags = _.map(tags, function (tag) {
+                return normalizeTag(tag);
+            });
+    
+            return tags;
+        };
+        tags.normalizeTags = normalizeTags;
+    
+        var compressTags = function (tags) {
+            if (_.isString(tags)) {
+                tags = tags.split(/( |,|;)+/);
+            }
+    
+            tags = _.map(tags, function (tag) {
+                return compressTag(tag);
+            });
+    
+            return tags;
+        };
+        tags.compressTags = compressTags;
+    
+        var extractTags = function (entity, searchFields) {
+            var tags = normalizeTags(entity.tags);
+    
+            _.each(searchFields, function (field) {
+                var text = entity[field] || '';
+    
+                if (text != '') {
+                    var hashTags = text.match(HASHTAG_REGEX);
+                    tags = tags.concat(normalizeTags(hashTags));
+                }
+            });
+    
+            return _.uniq(tags);
+        };
+        tags.extractTags = extractTags;
+
+        return tags;
+    });
+
+})();
+
+/**
+ * @file Collection of utilities
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipUtils', 
+		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Tags', 'pipUtils.Collections', 'pipUtils.FormErrors']);
 })();
 
 /**
@@ -3480,1016 +3667,4 @@
     }]);
 
 })();
-/**
- * @file Collection utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.Collections', []);
-
-    thisModule.factory('pipCollections', function () {
-        var collections = {};
-
-        // Index of element in array by key
-        collections.indexBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    return i;
-                }
-            }
-            return null;
-        };
-    
-        // Find element in array by key
-        collections.findBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    return items[i];
-                }
-            }
-            return null;
-        };
-    
-        // Remove element from array by value
-        collections.remove = function (items, item) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i] == item) {
-                    items.splice(i, 1);
-                    i--;
-                }
-            }
-        };
-    
-        // Removes element from array by key
-        collections.removeBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items.splice(i, 1);
-                    i--;
-                }
-            }
-        };
-    
-        // Replaced element by key
-        collections.replaceBy = function (items, key, value, data) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items[i] = data;
-                    return;
-                }
-            }
-        };
-    
-        // Calculate difference between two collections
-        collections.difference = function (a1, a2, comparator) {
-            var result = [];
-    
-            _.each(a1, function (e1) {
-                var e2 = _.find(a2, function (e) {
-                    return comparator(e1, e);
-                });
-    
-                if (e2 == null) {
-                    result.push(e1);
-                }
-            })
-    
-            return result;
-        };
-
-        return collections;
-    });
-
-})();
-
-/**
- * @file Date utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.Dates', []);
-
-    thisModule.factory('pipDates', function () {
-        var dates = {};
-
-        dates.addHours = function (date, hours) {
-            date = _.isDate(date) ? date : new Date(date);
-            var time = date.getTime() + hours * 3600000;
-            return new Date(time);
-        };
-
-        dates.toStartDay = function (date) {
-            date = _.isDate(date) ? date : new Date(date);
-            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        };
-
-        dates.toEndDay = function (date, offset) {
-            date = _.isDate(date) ? date : new Date(date);
-            offset = offset != null ? offset : 0;
-            var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return new Date(start.getTime() + 24 * 3600000 + offset);
-        };
-
-        dates.toStartWeek = function (date) {
-            date = _.isDate(date) ? date : new Date(date);
-            var dayOfWeek = date.getDay() ? date.getDay() : 7;
-            date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return new Date(date.getTime() - (dayOfWeek - 1) * 24 * 3600000);  // dayOfWeek = 0 для воскресенья
-        };
-
-        dates.toEndWeek = function (date, offset) {
-            date = _.isDate(date) ? date : new Date(date);
-            offset = offset != null ? offset : 0;
-            var dayOfWeek = date.getDay() ? date.getDay() : 7;
-            date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            return new Date(date.getTime() + (8 - dayOfWeek) * 24 * 3600000 + offset);
-        };
-
-        dates.toStartMonth = function (date) {
-            date = _.isDate(date) ? date : new Date(date);
-            return new Date(date.getFullYear(), date.getMonth(), 1);
-        };
-
-        dates.toEndMonth = function (date, offset) {
-            date = _.isDate(date) ? date : new Date(date);
-
-            var
-                month = date.getMonth() + 1,
-                year = date.getFullYear();
-
-            if (month > 11) {
-                year++;
-                month = 0;
-            }
-
-            date = new Date(year, month, 1);
-
-            if (offset != null) {
-                date = new Date(date.getTime() + offset);
-            }
-
-            return date;
-        };
-
-        dates.toStartYear = function (date) {
-            date = _.isDate(date) ? date : new Date(date);
-            return new Date(date.getFullYear(), 0, 1);
-        };
-
-        dates.toEndYear = function (date, offset) {
-            date = _.isDate(date) ? date : new Date(date);
-            date = new Date(date.getFullYear() + 1, 0, 1);
-
-            if (offset != null) {
-                date = new Date(date.getTime() + offset);
-            }
-
-            return date;
-        };
-
-        /** UTC functions  - **/
-        dates.toUTCDate = function (year, month, day) {
-            return new Date(Date.UTC(year, month, day));
-        };
-
-        dates.toUTCDate = function (date) {
-            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        };
-
-        dates.fromUTCDate = function (date) {
-            if (date == null) date = new Date();
-            return new Date(
-                date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-        };
-
-        dates.toUTCStartWeek = function (date) {
-            if(!_.isDate(date)) {
-                date = new Date(date);
-                date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            }
-            var dayOfWeek = date.getDay() ? date.getDay() : 7;
-            date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            date = dayOfWeek != 1 ? new Date(date.getTime() - (dayOfWeek - 1) * 24 * 3600000) : date;
-            return  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        };
-
-        dates.toUTCEndWeek = function (date, offset) {
-            if(!_.isDate(date)) {
-                date = new Date(date);
-                date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            }
-            offset = offset != null ? offset : 0;
-            var dayOfWeek = date.getDay() ? date.getDay() : 7;
-            date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            date = new Date(date.getTime() + (8 - dayOfWeek) * 24 * 3600000 + offset);
-            return  new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        };
-
-        return dates;
-    });
-})();
-
-/**
- * @file Form error utilities
- * @copyright Digital Living Software Corp. 2014-2016
- *
- */
- 
- /* global _, angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.FormErrors', []);
-
-    thisModule.factory('pipFormErrors', ['$rootScope', function ($rootScope) {
-		return {
-			errorsWithHint: errorsWithHint,
-            //submittedErrors: submittedErrors,
-            //submittedErrorsWithHint: submittedErrorsWithHint,
-            //dirtyErrors: dirtyErrors,
-            //dirtyErrorsWithHint: dirtyErrorsWithHint,
-            //touchedErrors: touchedErrors,            
-            touchedErrorsWithHint: touchedErrorsWithHint,
-            resetFormErrors: resetFormErrors,
-            setFormError: setFormError,
-            resetFieldsErrors: resetFieldsErrors
-		};
-		//-------------------
-
-        function errorsWithHint(field) {
-            if (field == null) return;
-			
-            return _.isEmpty(field.$error) ? { hint: true } : field.$error;
-        };
-		
-//         function submittedErrors(form, field) {
-//             if (form == null) throw new Error('Form is not set');
-//             if (field == null) throw new Error('Field is not set');
-// 
-//             if (form.$submitted)
-//                 return field.$error;
-//             return {};
-//         };
-// 
-//         function submittedErrorsWithHint(form, field) {
-//             if (form == null) throw new Error('Form is not set');
-//             if (field == null) throw new Error('Field is not set');
-// 
-//             if (form.$submitted) {
-//                 return _.isEmpty(field.$error) ? { hint: true} : field.$error;
-//             }
-//             return { hint: true };
-//         };
-// 
-//         function dirtyErrors(form, field) {
-//             if (form == null) throw new Error('Form is not set');
-//             if (field == null) throw new Error('Field is not set');
-// 
-//             if (field.$dirty || form.$dirty)
-//                 return field.$error;
-//             return {};
-//         };
-// 
-//         function dirtyErrorsWithHint(form, field) {
-//             if (form == null) throw new Error('Form is not set');
-//             if (field == null) throw new Error('Field is not set');
-// 
-//             if (field.$dirty || form.$dirty) {
-//                 return _.isEmpty(field.$error) ? { hint: true} : field.$error;
-//             }
-//             return { hint: true };
-//         };
-// 
-//         function touchedErrors(form, field) {
-//             if (form == null) throw new Error('Form is not set');
-//             if (field == null) throw new Error('Field is not set');
-//             
-//             if (field.$touched || form.$dirty)
-//                 return field.$error;
-//             return {};
-//         };
-
-        function touchedErrorsWithHint(form, field) {
-            if (form == null) return;
-            if (field == null) return;
-
-            if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
-                var result = _.isEmpty(field.$error) ? { hint: true} : field.$error;
-                return result;
-            }
-            return { hint: true };
-        };
-
-        function resetFormErrors(form, errors) {
-            form.$setPristine();
-            form.$setUntouched();
-
-            if (errors) {
-                form.$setDirty();
-                form.$setSubmitted();
-            }
-
-            form.$serverError = {};
-        };
-        
-        function resetFieldsErrors(form, field) {
-            if (!form) return;
-            if (field && form[field] && form[field].$error) {
-                 form[field].$error = {};
-            } else {
-                for (var prop in form) {
-                    if (form[prop] && form[prop].$error) {
-                        form[prop].$error = {};
-                    };
-                }
-                if (form && form.$error) form.$error = {};
-            }
-        };
-        
-        function setFormError(form, error, errorFieldMap) {
-            if (error == null) return;
-            // Prepare form server errors
-            form.$serverError = form.$serverError || {};
-            // Prepare error code
-            var code = error.code || (error.data || {}).code || null;
-            if (!code && error.status) code = error.status;
-
-            if (code) {
-                var 
-                    errorName = 'ERROR_' + code,
-                    field = errorFieldMap ? errorFieldMap[code] : null;
-                // Set server error to fields
-                if (field && form[field] && form[field].$setValidity) {
-                    form[field].$setValidity(errorName, false);
-                    return;
-                }
-
-                // Set server error to form
-                if (field == 'form') {
-                    form.$serverError[errorName] = true;
-                    return;
-                }
-            }
-
-            // if undefined error for this form or code === undefined/null, go to unhandled error page
-            if (error.data && error.data.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.data.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-
-            // Set as undefined error
-            if (error.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-
-            if (error.name) {
-                form.$serverError['ERROR_UNKNOWN'] = error.name;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-
-            form.$serverError['ERROR_UNKNOWN'] = error;
-            goToUnhandledErrorPage(error);
-        };
-
-        function goToUnhandledErrorPage(error) {
-            $rootScope.$emit('pipUnhandledInternalError', {
-                error: error
-            });
-        };
-        
-	}]);
-
-})();
-/**
- * @file General purpose utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, $, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.General', ['pipState', 'pipAssert']);
-
-    thisModule.factory('pipUtils', ['$rootScope', '$window', '$state', 'pipAssert', function ($rootScope, $window, $state, pipAssert) {
-
-        function strRepeat(str, qty) {
-            if (qty < 1) return '';
-            var result = '';
-            while (qty > 0) {
-                if (qty & 1) result += str;
-                qty >>= 1, str += str;
-            }
-            return result;
-        }
-
-        var toString = Object.prototype.toString;
-
-        var sprintf = (function sprintf() {
-            function get_type(variable) {
-                return toString.call(variable).slice(8, -1).toLowerCase();
-            }
-
-            var str_repeat = strRepeat;
-
-            var str_format = function() {
-                if (!str_format.cache.hasOwnProperty(arguments[0])) {
-                    str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
-                }
-                return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
-            };
-
-            str_format.format = function(parse_tree, argv) {
-                var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
-                for (i = 0; i < tree_length; i++) {
-                    node_type = get_type(parse_tree[i]);
-                    if (node_type === 'string') {
-                        output.push(parse_tree[i]);
-                    }
-                    else if (node_type === 'array') {
-                        match = parse_tree[i]; // convenience purposes only
-                        if (match[2]) { // keyword argument
-                            arg = argv[cursor];
-                            for (k = 0; k < match[2].length; k++) {
-                                if (!arg.hasOwnProperty(match[2][k])) {
-                                    throw new Error(sprintf('[_.sprintf] property "%s" does not exist', match[2][k]));
-                                }
-                                arg = arg[match[2][k]];
-                            }
-                        } else if (match[1]) { // positional argument (explicit)
-                            arg = argv[match[1]];
-                        }
-                        else { // positional argument (implicit)
-                            arg = argv[cursor++];
-                        }
-
-                        if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
-                            throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
-                        }
-                        switch (match[8]) {
-                            case 'b': arg = arg.toString(2); break;
-                            case 'c': arg = String.fromCharCode(arg); break;
-                            case 'd': arg = parseInt(arg, 10); break;
-                            case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
-                            case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
-                            case 'o': arg = arg.toString(8); break;
-                            case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
-                            case 'u': arg = Math.abs(arg); break;
-                            case 'x': arg = arg.toString(16); break;
-                            case 'X': arg = arg.toString(16).toUpperCase(); break;
-                        }
-                        arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
-                        pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
-                        pad_length = match[6] - String(arg).length;
-                        pad = match[6] ? str_repeat(pad_character, pad_length) : '';
-                        output.push(match[5] ? arg + pad : pad + arg);
-                    }
-                }
-                return output.join('');
-            };
-
-            str_format.cache = {};
-
-            str_format.parse = function(fmt) {
-                var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
-                while (_fmt) {
-                    if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
-                        parse_tree.push(match[0]);
-                    }
-                    else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
-                        parse_tree.push('%');
-                    }
-                    else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
-                        if (match[2]) {
-                            arg_names |= 1;
-                            var field_list = [], replacement_field = match[2], field_match = [];
-                            if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1]);
-                                while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-                                    if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                                        field_list.push(field_match[1]);
-                                    }
-                                    else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
-                                        field_list.push(field_match[1]);
-                                    }
-                                    else {
-                                        throw new Error('[_.sprintf] huh?');
-                                    }
-                                }
-                            }
-                            else {
-                                throw new Error('[_.sprintf] huh?');
-                            }
-                            match[2] = field_list;
-                        }
-                        else {
-                            arg_names |= 2;
-                        }
-                        if (arg_names === 3) {
-                            throw new Error('[_.sprintf] mixing positional and named placeholders is not (yet) supported');
-                        }
-                        parse_tree.push(match);
-                    }
-                    else {
-                        throw new Error('[_.sprintf] huh?');
-                    }
-                    _fmt = _fmt.substring(match[0].length);
-                }
-                return parse_tree;
-            };
-
-            return str_format;
-        })();
-
-        return {
-            copyProperty: copyProperty,
-            copy: copyProperty,
-            swapProperties: swapProperties,
-            swap: swapProperties,
-            convertToBoolean: convertToBoolean,
-            toBoolean: convertToBoolean,
-            toBool: convertToBoolean,
-            convertObjectIdsToString: convertObjectIdsToString,
-            OidToString: convertObjectIdsToString,
-            generateVerificationCode: generateVerificationCode,
-            vercode: generateVerificationCode,
-            goBack: goBack,
-            goBackAndSelect: goBackAndSelect,
-            scrollTo: scrollTo,
-            equalObjectIds: equalObjectIds,
-            eqOid: equalObjectIds,
-            notEqualObjectIds: notEqualObjectIds,
-            neqOid: notEqualObjectIds,
-            containsObjectId: containsObjectId,
-            hasOid: containsObjectId,
-            isObjectId: isObjectId,
-            // Strings functions. No analogues in lodash.strings
-            sampleLine: sampleLine,
-            hashCode: hashCode,
-            makeString: makeString,
-            getBrowser: getBrowser,
-            checkSupported: checkSupported,
-            sprintf: sprintf,
-            // Collection function. No analogues in lodash. It may be in lodash later. Look gitHub/lodash issue #1022
-            replaceBy: replaceBy
-        };
-        
-        //--------------------
-        function replaceBy(items, key, value, data) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items[i] = data;
-                    return;
-                }
-            }
-        };
-
-        // Creates a sample line from a text
-        function sampleLine(value, maxLength) {
-            if (!value || value == '') return '';
-
-            var length = value.indexOf('\n');
-            length = length >= 0 ? length : value.length;
-            length = length < maxLength ? value.length : maxLength;
-
-            return value.substring(0, length);
-        };
-
-        // Simple version of string hashcode
-        function hashCode(value) {
-            if (value == null) return 0;
-            var result = 0;
-            for (var i = 0; i < value.length; i++) {
-                result += value.charCodeAt(i);
-            }
-            return result;
-        };
-
-        // Ensure some object is a coerced to a string
-        function makeString(object) {
-            if (object == null) return '';
-            return '' + object;
-        };
-
-        function isObjectId(value) {
-            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            return checkForHexRegExp.test(value);
-        }
-
-        // Compares two ObjectIds (they are not equal by '==')
-        function equalObjectIds(value1, value2) {
-            if (value1 == null && value2 == null)
-                return true;
-
-            if (value1 == null || value2 == null)
-                return false;
-
-            return value1.toString() == value2.toString();
-        };
-
-        // Compares two ObjectIds (they are always not equal by '!=')
-        function notEqualObjectIds(value1, value2) {
-            if (value1 == null && value2 == null)
-                return false;
-
-            if (value1 == null || value2 == null)
-                return true;
-
-            return value1.toString() != value2.toString();
-        };
-
-        // Checks if array contains concrete objectId
-        function containsObjectId(values, value) {
-            return _.some(values, function (value1) {
-                return equalObjectIds(value1, value);
-            });
-        };
-
-        // Copy property from one object to another if it exists (not null)
-        function copyProperty(dest, destProperty, orig, origProperty) {
-            // Shift if only 3 arguments set
-            if (_.isObject(destProperty)
-                && typeof (origProperty) == 'undefined') {
-                origProperty = orig;
-                orig = destProperty;
-                destProperty = origProperty;
-            }
-    
-            if (orig[origProperty] || (typeof (orig[origProperty]) === 'number' && orig[origProperty] % 1 == 0)) {
-                dest[destProperty] = orig[origProperty];
-                return true;
-            }
-    
-            return false;
-        };
-    
-        // Swaps values of two properties
-        function swapProperties(obj, prop1, prop2) {
-            var 
-                temp1 = obj[prop1],
-                temp2 = obj[prop2];
-    
-            if (temp1) {
-                obj[prop2] = temp1;
-            }
-            else {
-                delete obj[prop2];
-            }
-    
-            if (temp2) {
-                obj[prop1] = temp2;
-            }
-            else {
-                delete obj[prop1];
-            }
-        };
-    
-        // Converts value into boolean
-        function convertToBoolean(value) {
-            if (value == null) return false;
-            if (!value) return false;
-            value = value.toString().toLowerCase();
-            return value == '1' || value == 'true';
-        };
-    
-        // Converts array of object ids to strings (for comparison)
-        function convertObjectIdsToString(values) {
-            return _.map(values, function (value) {
-                return value ? value.toString() : 0;
-            });
-        };
-
-        // Generates random big number for verification codes
-        function generateVerificationCode() {
-            return Math.random().toString(36).substr(2, 10).toUpperCase(); // remove `0.`
-        };
-
-        // Navigation
-        //-------------
-
-        function goBack() {
-            $window.history.back()
-        };
-
-        function goBackAndSelect(object, idParamName, objParamName) {
-            pipAssert.isDef(object, 'pipUtils.goBack: first argument should be defined');
-            pipAssert.isDef(idParamName, 'pipUtils.goBack: second argument should be defined');
-            pipAssert.isDef(objParamName, 'pipUtils.goBack: third argument should be defined');
-            pipAssert.isObject(object, 'pipUtils.goBack: first argument should be an object');
-            pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
-            pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
-                
-            if ($rootScope.$prevState && $rootScope.$prevState.name) {
-                var state = _.cloneDeep($rootScope.$prevState);
-
-                state.params[idParamName] = object.id;
-                state.params[objParamName] = object;
-
-                $state.go(state.name, state.params);
-            } else {
-                $window.history.back();
-            }
-        };
-
-        // Scrolling
-        //--------------
-        
-        function scrollTo(parentElement, childElement, animationDuration) {
-            if(!parentElement || !childElement) return;
-            if (animationDuration == undefined) animationDuration = 300;
-
-            setTimeout(function () {
-                if (!$(childElement).position()) return;
-                var modDiff= Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
-                if (modDiff < 20) return;
-                var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
-                if (animationDuration > 0)
-                    $(parentElement).animate({
-                        scrollTop: scrollTo + 'px'
-                    }, animationDuration);
-            }, 100);
-        };
-
-        // todo add support for iPhone
-        function getBrowser() {
-            var ua = $window.navigator.userAgent;
-
-            var bName = function () {
-                if (ua.search(/Edge/) > -1) return "edge";
-                if (ua.search(/MSIE/) > -1) return "ie";
-                if (ua.search(/Trident/) > -1) return "ie11";
-                if (ua.search(/Firefox/) > -1) return "firefox";
-                if (ua.search(/Opera/) > -1) return "opera";
-                if (ua.search(/OPR/) > -1) return "operaWebkit";
-                if (ua.search(/YaBrowser/) > -1) return "yabrowser";
-                if (ua.search(/Chrome/) > -1) return "chrome";
-                if (ua.search(/Safari/) > -1) return "safari";
-                if (ua.search(/Maxthon/) > -1) return "maxthon";
-            }();
-
-            var version;
-            switch (bName) {
-                case "edge":
-                    version = (ua.split("Edge")[1]).split("/")[1];
-                    break;
-                case "ie":
-                    version = (ua.split("MSIE ")[1]).split(";")[0];
-                    break;
-                case "ie11":
-                    bName = "ie";
-                    version = (ua.split("; rv:")[1]).split(")")[0];
-                    break;
-                case "firefox":
-                    version = ua.split("Firefox/")[1];
-                    break;
-                case "opera":
-                    version = ua.split("Version/")[1];
-                    break;
-                case "operaWebkit":
-                    bName = "opera";
-                    version = ua.split("OPR/")[1];
-                    break;
-                case "yabrowser":
-                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
-                    break;
-                case "chrome":
-                    version = (ua.split("Chrome/")[1]).split(" ")[0];
-                    break;
-                case "safari":
-                    version = (ua.split("Version/")[1]).split(" ")[0];
-                    break;
-                case "maxthon":
-                    version = ua.split("Maxthon/")[1];
-                    break;
-            }
-
-            var platform = 'desktop';
-            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase())) platform = 'mobile';
-
-            var os;
-            try {
-                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [u])[0].replace('sunos', 'solaris'),
-                    osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
-                    os = osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-            } catch (err) {
-                os = 'unknown'
-            }
-
-            var browsrObj;
-
-            try {
-                browsrObj = {
-                    platform: platform,
-                    browser: bName,
-                    versionFull: version,
-                    versionShort: version.split(".")[0],
-                    os: os
-                };
-            } catch (err) {
-                browsrObj = {
-                    platform: platform,
-                    browser: 'unknown',
-                    versionFull: 'unknown',
-                    versionShort: 'unknown',
-                    os: 'unknown'
-                };
-            }
-
-            return browsrObj;
-        }
-
-        // todo нужны каке нибудь настройки?
-        function checkSupported(supported) {
-            if (!supported) supported = {
-                edge: 11,
-                ie: 11,
-                firefox: 43, //4, for testing
-                opera: 35,
-                chrome: 47
-            };
-
-            var systemInfo = getBrowser();
-
-            if (systemInfo && systemInfo.browser && supported[systemInfo.browser]){
-                if (systemInfo.versionShort >= supported[systemInfo.browser]) return true;
-            }
-            return true;
-
-        };
-
-    }]);
-
-})();
-
-/**
- * @file String utilities
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Move functions to general utilities
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.Strings', []);
-
-    thisModule.factory('pipStrings', function () {
-        var strings = {};
-
-        // Creates a sample line from a text
-        strings.sampleLine = function (value, maxLength) {
-            if (!value || value == '') return '';
-    
-            var length = value.indexOf('\n');
-            length = length >= 0 ? length : value.length;
-            length = length < maxLength ? value.length : maxLength;
-    
-            return value.substring(0, length);
-        };
-    
-        // Simple version of string hashcode
-        strings.hashCode = function (value) {
-            if (value == null) return 0;
-            var result = 0;
-            for (var i = 0; i < value.length; i++) {
-                result += value.charCodeAt(i);
-            }
-            return result;
-        };
-    
-        return strings;
-    });
-
-})();
-/**
- * @file Search tag utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.Tags', []);
-
-    thisModule.factory('pipTags', function () {
-        var tags = {};
-        
-        var HASHTAG_REGEX = /#\w+/g;
-    
-        var normalizeTag = function (tag) {
-            return tag 
-                ? _.trim(tag.replace(/(_|#)+/g, ' '))
-                : null;
-        };
-        tags.normalizeTag = normalizeTag;
-    
-        var compressTag = function (tag) {
-            return tag
-                ? tag.replace(/( |_|#)/g, '').toLowerCase()
-                : null;
-        };
-        tags.compressTag = compressTag;
-    
-        var equalTags = function (tag1, tag2) {
-            if (tag1 == null && tag2 == null)
-                return true;
-            if (tag1 == null || tag2 == null)
-                return false;
-            return compressTag(tag1) == compressTag(tag2);
-        };
-        tags.equalTags = equalTags;
-    
-        var normalizeTags = function (tags) {
-            if (_.isString(tags)) {
-                tags = tags.split(/( |,|;)+/);
-            }
-    
-            tags = _.map(tags, function (tag) {
-                return normalizeTag(tag);
-            });
-    
-            return tags;
-        };
-        tags.normalizeTags = normalizeTags;
-    
-        var compressTags = function (tags) {
-            if (_.isString(tags)) {
-                tags = tags.split(/( |,|;)+/);
-            }
-    
-            tags = _.map(tags, function (tag) {
-                return compressTag(tag);
-            });
-    
-            return tags;
-        };
-        tags.compressTags = compressTags;
-    
-        var extractTags = function (entity, searchFields) {
-            var tags = normalizeTags(entity.tags);
-    
-            _.each(searchFields, function (field) {
-                var text = entity[field] || '';
-    
-                if (text != '') {
-                    var hashTags = text.match(HASHTAG_REGEX);
-                    tags = tags.concat(normalizeTags(hashTags));
-                }
-            });
-    
-            return _.uniq(tags);
-        };
-        tags.extractTags = extractTags;
-
-        return tags;
-    });
-
-})();
-
-/**
- * @file Collection of utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipUtils', 
-		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Dates', 'pipUtils.Tags', 'pipUtils.Collections', 'pipUtils.FormErrors']);
-})();
-
 //# sourceMappingURL=pip-webui-core.js.map

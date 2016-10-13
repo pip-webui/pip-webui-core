@@ -17,8 +17,6 @@
         'pipTimer',
         'pipAssert',
         'pipDebug',
-        'pipDateFormat',
-        'pipDateTimeFilters',
         'pipTranslateFilters',
         'pipClearErrors',
         'pipTheme',

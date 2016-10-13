@@ -9,7 +9,6 @@
         { title: 'Transaction', state: 'transaction', url: '/transaction', controller: 'TransactionController', templateUrl: 'transaction.html' },
         { title: 'Timer', state: 'timer', url: '/timer', controller: 'TimerController', templateUrl: 'timer.html' },
         { title: 'System Info', state: 'system_info', url: '/system_info', controller: 'SystemInfoController', templateUrl: 'system_info.html' },
-        { title: 'Date Format', state: 'date_format', url: '/date_format', controller: 'DateFormatController', templateUrl: 'date_format.html' },
         { title: 'Themes', state: 'themes', url: '/themes', controller: 'ThemesController', templateUrl: 'themes.html' }
     ];
 
