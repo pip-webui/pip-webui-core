@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('appCoreServices.Timer', ['pipTimer', 'pipDateFormat']);
+    var thisModule = angular.module('appCoreServices.Timer', ['pipTimer']);
 
     thisModule.config(function (pipTranslateProvider) {
         // This is used for translate sample
@@ -27,7 +27,7 @@
     });
 
     thisModule.controller('TimerController',
-        function($scope, pipTimer, pipDateFormat) {
+        function($scope, pipTimer) {
             var startTimePull = null,
                 startTimeUpdate = null;
 
@@ -48,7 +48,7 @@
 
             $scope.getAutoPullDif = function () {
                 var now = new Date();
-                var dif = pipDateFormat.formatMillisecondsToSeconds(now - startTimePull);
+                var dif = Math.floor((now - startTimePull) / 1000);
                 if (dif > 14) startTimePull = new Date();
                 return dif;
             };
@@ -57,7 +57,7 @@
 
             $scope.getAutoUpdateDif = function () {
                 var now = new Date();
-                var dif = pipDateFormat.formatMillisecondsToSeconds(now - startTimeUpdate);
+                var dif = Math.floor((now - startTimeUpdate) / 1000);
                 if (dif > 59) startTimeUpdate = new Date();
                 return dif;
             }

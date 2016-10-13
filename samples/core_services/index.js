@@ -8,14 +8,8 @@
         //{ title: 'Error', state: 'error', url: '/error', controller: 'ErrorController', templateUrl: 'error.html' },
         { title: 'Transaction', state: 'transaction', url: '/transaction', controller: 'TransactionController', templateUrl: 'transaction.html' },
         { title: 'Timer', state: 'timer', url: '/timer', controller: 'TimerController', templateUrl: 'timer.html' },
-        { title: 'System Info', state: 'system_info', url: '/system_info', controller: 'SystemInfoController', templateUrl: 'system_info.html' },
-<<<<<<< HEAD
-        { title: 'Themes', state: 'themes', url: '/themes', controller: 'ThemesController', templateUrl: 'themes.html' }
+        { title: 'System Info', state: 'system_info', url: '/system_info', controller: 'SystemInfoController', templateUrl: 'system_info.html' }
     ];
-=======
-        { title: 'Date Format', state: 'date_format', url: '/date_format', controller: 'DateFormatController', templateUrl: 'date_format.html' }
-        ];
->>>>>>> 78c739cb7547bc9e739f0be812781cfd6f003183
 
     var thisModule = angular.module('appCoreServices', 
         [
@@ -24,7 +18,7 @@
             'ngMaterial', 'wu.masonry', 'LocalStorageModule', 'angularFileUpload', 'ngAnimate', 
 			'pipCore',
             'appCoreServices.Error', 'appCoreServices.Timer',
-            'appCoreServices.Transaction', 'appCoreServices.Translate', 'appCoreServices.DateFormat',
+            'appCoreServices.Transaction', 'appCoreServices.Translate',
             'appCoreServices.SystemInfo'
         ]
     );
