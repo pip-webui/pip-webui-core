@@ -50,7 +50,7 @@
                 $rootScope.$language = language;
             
             // Resetting root scope to force update language on the screen
-            function reset(fullReset, partialReset) {
+            function resetContent(fullReset, partialReset) {
                 fullReset = fullReset !== undefined ? !!fullReset : true;
                 partialReset = partialReset !== undefined ? !!partialReset : true;
 
@@ -62,19 +62,28 @@
                 }, 0);
             }
 
+            function setLanguage(newLanguage, fullReset, partialReset) {
+                pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
+
+                if (newLanguage != null && newLanguage != language) {
+                    language = newLanguage;
+                    
+                    if (persist)
+                        localStorageService.set('language', language);
+                    if (setRoot)
+                        $rootScope.$language = language;
+                    
+                    // Resetting content.
+                    resetContent(fullReset, partialReset);
+
+                    // Sending notification
+                    $rootScope.$broadcast('pipLanguageChanged', newLanguage);
+                }
+                return language;
+            }
+
             return {
-                use: function (newLanguage, fullReset, partialReset) {
-                    pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
-                    if (newLanguage != null && newLanguage != language) {
-                        language = newLanguage;
-                        if (persist)
-                            localStorageService.set('language', language);
-                        if (setRoot)
-                            $rootScope.$language = language;
-                        reset(fullReset, partialReset);
-                    }
-                    return language;
-                },
+                use: setLanguage,
 
                 translations: setTranslations,
                 translate: translate,

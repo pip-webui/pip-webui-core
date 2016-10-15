@@ -10,12 +10,14 @@
 
     angular.module('pipCore', [
         'pipUtils',
+        'pipAssert',
+        'pipDebug',
         'pipScope',
 	    'pipTranslate',
         'pipState',
         'pipTimer',
-        'pipAssert',
-        'pipDebug'
+        'pipSession',
+        'pipIdentity'
     ]);
     
 })();
@@ -99,6 +101,8 @@
 
         this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
             $state.redirect = redirect;
+            $state.goBack = goBack;
+            $state.goBackAndSelect = goBackAndSelect;
             
             return $state;
             
@@ -130,6 +134,27 @@
                 }
 
                 return false;
+            }
+
+            function goBack() {
+                $window.history.back()
+            }
+
+            function goBackAndSelect(obj, objParamName, id, idParamName) {
+                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
+                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
+                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
+                    
+                if ($rootScope.$prevState && $rootScope.$prevState.name) {
+                    var state = _.cloneDeep($rootScope.$prevState);
+
+                    state.params[idParamName] = id;
+                    state.params[objParamName] = obj;
+
+                    $state.go(state.name, state.params);
+                } else {
+                    $window.history.back();
+                }
             }
         }];
 
@@ -704,6 +729,184 @@
 })();
 
 /**
+ * @file Identity service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipIdentity', []);
+
+    thisModule.provider('pipIdentity', ['$timeout', 'pipAssertProvider', function($timeout, pipAssertProvider) {
+        var 
+            setRoot = true,
+            identity = null;
+
+        this.setRoot = initSetRoot;
+        this.identity = initIdentity;
+
+        this.$get = ['$rootScope', 'pipAssert', function ($rootScope, pipAssert) {
+            // Set root variable
+            if (setRoot)
+                $rootScope.$identity = identity;
+
+            function getIdentity() {
+                return identity;
+            }
+
+            // Resetting root scope to force update language on the screen
+            function resetContent(fullReset, partialReset) {
+                fullReset = fullReset !== undefined ? !!fullReset : true;
+                partialReset = partialReset !== undefined ? !!partialReset : true;
+
+                $rootScope.$reset = fullReset;
+                $rootScope.$partialReset = partialReset;
+                $timeout(function() {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
+            }
+
+            function setIdentity(newIdentity, fullReset, partialReset) {
+                if (newIdentity != null)
+                    pipAssert.isObject(newIdentity || '', "pipIdentity.set: argument should be an object");
+
+                identity = newIdentity;
+
+                if (setRoot)
+                    $rootScope.$identity = identity;
+
+                resetContent(fullReset, partialReset);
+
+                $rootScope.$broadcast('pipIdentityChanged', identity);
+            }
+
+            return {
+                get: getIdentity,
+                set: setIdentity,
+            }
+        }];
+
+        // Initialize set root flag
+        function initSetRoot(newSetRoot) {
+            if (newSetRoot != null) {
+                pipAssertProvider.isBoolean(newSetRoot || '', "pipIdentityProvider.setRoot: argument should be a boolean");
+                setRoot = newSetRoot;
+            }
+            return setRoot;  
+        }
+
+        // Initialize identity
+        function initIdentity(newIdentity) {
+            if (newIdentity != null) {
+                pipAssertProvider.isObject(newIdentity || '', "pipIdentityProvider.identity: argument should be an object");
+                identity = newIdentity;
+            }
+            return identity;  
+        }
+
+    }]);
+
+})();
+/**
+ * @file Session service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSession', []);
+
+    thisModule.provider('pipSession', ['$timeout', 'pipAssertProvider', function($timeout, pipAssertProvider) {
+        var 
+            setRoot = true,
+            session = null;
+
+        this.setRoot = initSetRoot;
+        this.session = initSession;
+
+        this.$get = ['$rootScope', 'pipAssert', function ($rootScope, pipAssert) {
+            // Set root variable
+            if (setRoot)
+                $rootScope.$session = session;
+            
+            // Resetting root scope to force update language on the screen
+            function resetContent(fullReset, partialReset) {
+                fullReset = fullReset !== undefined ? !!fullReset : true;
+                partialReset = partialReset !== undefined ? !!partialReset : true;
+
+                $rootScope.$reset = fullReset;
+                $rootScope.$partialReset = partialReset;
+                $timeout(function() {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
+            }
+
+            function startSession(newSession, fullReset, partialReset) {
+                pipAssert.isObject(newSession || '', "pipSession.start: argument should be an object");
+
+                session = newSession;
+
+                if (setRoot)
+                    $rootScope.$session = session;
+
+                resetContent(fullReset, partialReset);
+
+                $rootScope.$broadcast('pipSessionStarted', session);
+            }
+
+            function stopSession(fullReset, partialReset) {
+                var oldSession = session;
+                session = null;
+
+                if (setRoot)
+                    $rootScope.$session = session;
+
+                resetContent(fullReset, partialReset);
+
+                $rootScope.$broadcast('pipSessionStopped', oldSession);
+            }
+
+            function getSession() {
+                return session;
+            }
+
+            return {
+                get: getSession,
+                start: startSession,
+                stop: stopSession
+            }
+        }];
+
+        // Initialize set root flag
+        function initSetRoot(newSetRoot) {
+            if (newSetRoot != null) {
+                pipAssertProvider.isBoolean(newSetRoot || '', "pipSessionProvider.setRoot: argument should be a boolean");
+                setRoot = newSetRoot;
+            }
+            return setRoot;  
+        }
+
+        // Initialize session
+        function initSession(newSession) {
+            if (newSession != null) {
+                pipAssertProvider.isObject(newSession || '', "pipSessionProvider.session: argument should be an object");
+                session = newSession;
+            }
+            return session;  
+        }
+
+    }]);
+
+})();
+/**
  * @file Global application timer service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -903,7 +1106,7 @@
                 $rootScope.$language = language;
             
             // Resetting root scope to force update language on the screen
-            function reset(fullReset, partialReset) {
+            function resetContent(fullReset, partialReset) {
                 fullReset = fullReset !== undefined ? !!fullReset : true;
                 partialReset = partialReset !== undefined ? !!partialReset : true;
 
@@ -915,19 +1118,28 @@
                 }, 0);
             }
 
+            function setLanguage(newLanguage, fullReset, partialReset) {
+                pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
+
+                if (newLanguage != null && newLanguage != language) {
+                    language = newLanguage;
+                    
+                    if (persist)
+                        localStorageService.set('language', language);
+                    if (setRoot)
+                        $rootScope.$language = language;
+                    
+                    // Resetting content.
+                    resetContent(fullReset, partialReset);
+
+                    // Sending notification
+                    $rootScope.$broadcast('pipLanguageChanged', newLanguage);
+                }
+                return language;
+            }
+
             return {
-                use: function (newLanguage, fullReset, partialReset) {
-                    pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
-                    if (newLanguage != null && newLanguage != language) {
-                        language = newLanguage;
-                        if (persist)
-                            localStorageService.set('language', language);
-                        if (setRoot)
-                            $rootScope.$language = language;
-                        reset(fullReset, partialReset);
-                    }
-                    return language;
-                },
+                use: setLanguage,
 
                 translations: setTranslations,
                 translate: translate,
@@ -1370,8 +1582,6 @@
             OidToString: convertObjectIdsToString,
             generateVerificationCode: generateVerificationCode,
             vercode: generateVerificationCode,
-            goBack: goBack,
-            goBackAndSelect: goBackAndSelect,
             scrollTo: scrollTo,
             equalObjectIds: equalObjectIds,
             eqOid: equalObjectIds,
@@ -1521,33 +1731,6 @@
         // Generates random big number for verification codes
         function generateVerificationCode() {
             return Math.random().toString(36).substr(2, 10).toUpperCase(); // remove `0.`
-        };
-
-        // Navigation
-        //-------------
-
-        function goBack() {
-            $window.history.back()
-        };
-
-        function goBackAndSelect(object, idParamName, objParamName) {
-            pipAssert.isDef(object, 'pipUtils.goBack: first argument should be defined');
-            pipAssert.isDef(idParamName, 'pipUtils.goBack: second argument should be defined');
-            pipAssert.isDef(objParamName, 'pipUtils.goBack: third argument should be defined');
-            pipAssert.isObject(object, 'pipUtils.goBack: first argument should be an object');
-            pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
-            pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
-                
-            if ($rootScope.$prevState && $rootScope.$prevState.name) {
-                var state = _.cloneDeep($rootScope.$prevState);
-
-                state.params[idParamName] = object.id;
-                state.params[objParamName] = object;
-
-                $state.go(state.name, state.params);
-            } else {
-                $window.history.back();
-            }
         };
 
         // Scrolling
@@ -1722,92 +1905,92 @@
     });
 
 })();
-/**
- * @file Search tag utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
+// /**
+//  * @file Search tag utilities
+//  * @copyright Digital Living Software Corp. 2014-2016
+//  */
 
-/* global _, angular */
+// /* global _, angular */
 
-(function () {
-    'use strict';
+// (function () {
+//     'use strict';
 
-    var thisModule = angular.module('pipUtils.Tags', []);
+//     var thisModule = angular.module('pipUtils.Tags', []);
 
-    thisModule.factory('pipTags', function () {
-        var tags = {};
+//     thisModule.factory('pipTags', function () {
+//         var tags = {};
         
-        var HASHTAG_REGEX = /#\w+/g;
+//         var HASHTAG_REGEX = /#\w+/g;
     
-        var normalizeTag = function (tag) {
-            return tag 
-                ? _.trim(tag.replace(/(_|#)+/g, ' '))
-                : null;
-        };
-        tags.normalizeTag = normalizeTag;
+//         var normalizeTag = function (tag) {
+//             return tag 
+//                 ? _.trim(tag.replace(/(_|#)+/g, ' '))
+//                 : null;
+//         };
+//         tags.normalizeTag = normalizeTag;
     
-        var compressTag = function (tag) {
-            return tag
-                ? tag.replace(/( |_|#)/g, '').toLowerCase()
-                : null;
-        };
-        tags.compressTag = compressTag;
+//         var compressTag = function (tag) {
+//             return tag
+//                 ? tag.replace(/( |_|#)/g, '').toLowerCase()
+//                 : null;
+//         };
+//         tags.compressTag = compressTag;
     
-        var equalTags = function (tag1, tag2) {
-            if (tag1 == null && tag2 == null)
-                return true;
-            if (tag1 == null || tag2 == null)
-                return false;
-            return compressTag(tag1) == compressTag(tag2);
-        };
-        tags.equalTags = equalTags;
+//         var equalTags = function (tag1, tag2) {
+//             if (tag1 == null && tag2 == null)
+//                 return true;
+//             if (tag1 == null || tag2 == null)
+//                 return false;
+//             return compressTag(tag1) == compressTag(tag2);
+//         };
+//         tags.equalTags = equalTags;
     
-        var normalizeTags = function (tags) {
-            if (_.isString(tags)) {
-                tags = tags.split(/( |,|;)+/);
-            }
+//         var normalizeTags = function (tags) {
+//             if (_.isString(tags)) {
+//                 tags = tags.split(/( |,|;)+/);
+//             }
     
-            tags = _.map(tags, function (tag) {
-                return normalizeTag(tag);
-            });
+//             tags = _.map(tags, function (tag) {
+//                 return normalizeTag(tag);
+//             });
     
-            return tags;
-        };
-        tags.normalizeTags = normalizeTags;
+//             return tags;
+//         };
+//         tags.normalizeTags = normalizeTags;
     
-        var compressTags = function (tags) {
-            if (_.isString(tags)) {
-                tags = tags.split(/( |,|;)+/);
-            }
+//         var compressTags = function (tags) {
+//             if (_.isString(tags)) {
+//                 tags = tags.split(/( |,|;)+/);
+//             }
     
-            tags = _.map(tags, function (tag) {
-                return compressTag(tag);
-            });
+//             tags = _.map(tags, function (tag) {
+//                 return compressTag(tag);
+//             });
     
-            return tags;
-        };
-        tags.compressTags = compressTags;
+//             return tags;
+//         };
+//         tags.compressTags = compressTags;
     
-        var extractTags = function (entity, searchFields) {
-            var tags = normalizeTags(entity.tags);
+//         var extractTags = function (entity, searchFields) {
+//             var tags = normalizeTags(entity.tags);
     
-            _.each(searchFields, function (field) {
-                var text = entity[field] || '';
+//             _.each(searchFields, function (field) {
+//                 var text = entity[field] || '';
     
-                if (text != '') {
-                    var hashTags = text.match(HASHTAG_REGEX);
-                    tags = tags.concat(normalizeTags(hashTags));
-                }
-            });
+//                 if (text != '') {
+//                     var hashTags = text.match(HASHTAG_REGEX);
+//                     tags = tags.concat(normalizeTags(hashTags));
+//                 }
+//             });
     
-            return _.uniq(tags);
-        };
-        tags.extractTags = extractTags;
+//             return _.uniq(tags);
+//         };
+//         tags.extractTags = extractTags;
 
-        return tags;
-    });
+//         return tags;
+//     });
 
-})();
+// })();
 
 /**
  * @file Collection of utilities
@@ -1820,7 +2003,7 @@
     'use strict';
 
     angular.module('pipUtils', 
-		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Tags', 'pipUtils.Collections']);
+		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Collections']);
 })();
 
 //# sourceMappingURL=pip-webui-core.js.map

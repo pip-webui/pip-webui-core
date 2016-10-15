@@ -10,12 +10,14 @@
 
     angular.module('pipCore', [
         'pipUtils',
+        'pipAssert',
+        'pipDebug',
         'pipScope',
 	    'pipTranslate',
         'pipState',
         'pipTimer',
-        'pipAssert',
-        'pipDebug'
+        'pipSession',
+        'pipIdentity'
     ]);
     
 })();

@@ -78,6 +78,8 @@
 
         this.$get = function ($state, $timeout, pipAssert) {
             $state.redirect = redirect;
+            $state.goBack = goBack;
+            $state.goBackAndSelect = goBackAndSelect;
             
             return $state;
             
@@ -109,6 +111,27 @@
                 }
 
                 return false;
+            }
+
+            function goBack() {
+                $window.history.back()
+            }
+
+            function goBackAndSelect(obj, objParamName, id, idParamName) {
+                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
+                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
+                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
+                    
+                if ($rootScope.$prevState && $rootScope.$prevState.name) {
+                    var state = _.cloneDeep($rootScope.$prevState);
+
+                    state.params[idParamName] = id;
+                    state.params[objParamName] = obj;
+
+                    $state.go(state.name, state.params);
+                } else {
+                    $window.history.back();
+                }
             }
         };
 
