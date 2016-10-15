@@ -28,27 +28,6 @@
         function($rootScope, pipTranslate, $state) {
             $rootScope.$on('$stateChangeSuccess',
                 function(event, toState, toParams, fromState, fromParams) {
-                    if ($rootScope.$user && $rootScope.$user.id && toState.params && toState.params.access) {
-                        if (toParams && toParams.party_id) {
-                            var party = _.find($rootScope.$user.party_access, {party_id: toParams.party_id});
-                            if (party) {
-                                if (toState.params.access == 'manager' && !party.manager ||
-                                    toState.params.access == 'contributor' && !party.contributor) {
-                                    if (toState.params.toState) {
-                                        event.preventDefault();
-                                        $state.go(toState.params.toState, toParams);
-                                        return;
-                                    }
-                                }
-                            } else {
-                                if (toParams.party_id != $rootScope.$user.id && toState.params.toState) {
-                                    event.preventDefault();
-                                    $state.go(toState.params.toState, toParams);
-                                    return;
-                                }
-                            }
-                        }
-                    }
                     // Unset routing variable to disable page transition
                     $rootScope.$routing = false;
                     // Record current and previous state

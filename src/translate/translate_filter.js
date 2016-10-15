@@ -8,7 +8,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
+    var thisModule = angular.module('pipTranslate.Filters', ['pipTranslate.Service']);
 
     thisModule.filter('translate', function (pipTranslate) {
         return function (key) {
