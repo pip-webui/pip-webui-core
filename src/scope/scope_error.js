@@ -11,7 +11,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipErrors', ['pipUtils', 'pipAssert']);
+    var thisModule = angular.module('pipScope.Error', ['pipAssert']);
 
     /*
      * Error is designed to assist with error handling

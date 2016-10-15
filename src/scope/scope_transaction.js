@@ -12,7 +12,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipTransactions', ['pipTranslate', 'pipErrors']);
+    var thisModule = angular.module('pipScope.Transaction', ['pipTranslate', 'pipScope.Error']);
 
 	thisModule.config(function(pipTranslateProvider) {
         
