@@ -20,10 +20,6 @@
         'pipTranslateFilters',
         'pipClearErrors',
 
-        'pipFocused',
-        'pipSelected',
-        'pipInfiniteScroll',
-        'pipDraggable',
         'pipUnsavedChanges',
         'pipFabTooltipVisibility',
     ]);
