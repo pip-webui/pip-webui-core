@@ -1,77 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html class="no-scroll">
 <head lang="en">
     <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="-1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>WebUI Framework. PipDevs Team</title>
+    <title>Core Services</title>
 
-    <link rel="stylesheet" href="../lib/pip-webui-lib.css"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
-    
-    <style>
-        .pip-title > h1 {
-            margin-top: 20px;
-            margin-bottom: 5px;
-        }
+    <link rel="stylesheet" href="../../lib/pip-webui-lib.css"/>
+    <link rel="stylesheet" href="styles.css"/>
 
-        .pip-title > div {
-            margin-bottom: 30px;
-        }
+    <script src="../../lib/pip-webui-lib.js"></script>
+    <script src="../../dist/pip-webui-core.js"></script>
 
-        .pip-section > h2 {
-            margin-bottom: 5px;
-        }
-    </style>
-
-    <script src="../lib/pip-webui-lib.js"></script>
-
-    <script>
-        app = angular.module('app', ['ngMaterial']);
-    </script>
+    <script src="index.js"></script>
+    <script src="error.js"></script>
+    <script src="timer.js"></script>
+    <script src="transaction.js"></script>
+    <script src="translate.js"></script>
+    <script src="system_info.js"></script>
 </head>
-<body ng-app="app" class="layout-column layout-align-start-center">
-    <section>
-        <div class="pip-title">
-            <h1>WebUI Framework. PipDevs Team</h1>
-            <div>(c) Digital Living Software Corp.</div>
+
+<body class="layout-column" ng-app="appCoreServices" ng-controller="AppController">
+    <md-toolbar ng-if="!$partialReset">
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="menu"
+                ng-click="onToggleMenu()" hide-gt-sm>
+                <md-icon md-svg-icon="icons:menu"></md-icon>
+            </md-button>
+            <span>Core Services - {{ 'APPLICATION_TITLE' | translate }}</span>
+            <md-menu md-position-mode="target-right target">
+                <span class="pip-appbar-language"
+                      ng-click="$mdOpenMenu()"
+                      aria-label="language selection">
+                    {{ $language | translate}}
+                    <md-icon md-svg-icon="icons:triangle-down"></md-icon>
+                </span>
+                <md-menu-content width="3">
+                    <md-menu-item ng-repeat="lang in languages">
+                        <md-button ng-click="onLanguageClick(lang)">{{lang | translate}}</md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
         </div>
+    </md-toolbar>
 
-        <div layout=row>
-            <section class="pip-section">
-                <h2>Core Services</h2>
-                <ul>
-                    <li><a href="core_services/index.html#/translate">Translate</a></li>
-                    <!--li><a href="core_services/index.html#/error">Error</a></li-->
-                    <li><a href="core_services/index.html#/transaction">Transaction</a></li>
-                    <li><a href="core_services/index.html#/timer">Timer</a></li>
-                    <li><a href="core_services/index.html#/system_info">System Info</a></li>
-                </ul>
-            </section>
+    <div class="layout-row flex" ng-if="!$reset">
+        <md-sidenav md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"
+                    class="md-whiteframe-z2 md-sidenav-left layout-column">
+            <md-list>
+                <md-list-item ng-repeat="contentItem in content"
+                    ng-click="onSwitchPage(contentItem.state)"
+                    ng-class="{ 'selected-state': isActiveState(contentItem.state) }">
+                    <p ui-sref="{{contentItem.state}}">{{contentItem.title}}</p>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
 
-            <div class="w24"></div>
-
-            <section class="pip-section">
-                <h2>Behaviors</h2>
-                <ul>
-                    <li><a href="behaviors/index.html#/draggable">Draggable</a></li>
-                    <li><a href="behaviors/index.html#/draggable_input">Draggable with input fields</a></li>
-                    <li><a href="behaviors/index.html#/focused">Focused</a></li>
-                    <li><a href="behaviors/index.html#/selected">Selected</a></li>
-                    <li><a href="behaviors/index.html#/infinite_scroll">Infinite Scroll</a></li>
-                    <li><a href="behaviors/index.html#/unsaved_changes">Unsaved changes</a></li>
-                </ul>
-            </section>
-        </div>
-
-        <section class="pip-section">
-            <h2>References</h2>
-            <ul>
-                <li><a href="https://material.angularjs.org/latest/#/">Angular Material Intro</a></li>
-                <li><a href="https://github.com/angular/material">Angular Material GitHub</a></li>
-                <li><a href="https://www.google.com/design/spec/material-design/introduction.html">Material Design Guidelines</a></li>
-                <li><a href="http://design.google.com">Google Design References</a></li>
-            </ul>
-        </section>
-    </section>
+        <md-content id="content" class="p16 flex">
+            <div ui-view></div>
+        </md-content>
+    </div>
 </body>
 </html>

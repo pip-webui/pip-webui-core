@@ -9,5 +9,5 @@
     'use strict';
 
     angular.module('pipUtils', 
-		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Tags', 'pipUtils.Collections', 'pipUtils.FormErrors']);
+		['pipUtils.General', 'pipUtils.Strings', 'pipUtils.Tags', 'pipUtils.Collections']);
 })();

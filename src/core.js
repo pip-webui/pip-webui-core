@@ -17,11 +17,7 @@
         'pipTimer',
         'pipAssert',
         'pipDebug',
-        'pipTranslateFilters',
-        'pipClearErrors',
-
-        'pipUnsavedChanges',
-        'pipFabTooltipVisibility',
+        'pipTranslateFilters'
     ]);
     
 })();
